@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./css/bono.css" />
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script>
+            var main = function() {
+                var view = io.connect('http://127.0.0.1:3000/view');
+
+                // 아이디 전송
+                view.on('connect', function(){
+                    console.log('connected');
+                    view.emit('pinfo_request', 'positoy');
+                });
+
+                // 프로젝트 정보 받아서 화면 갱신
+                view.on('pinfo_response', function(j){
+                    var o = JSON.parse(j);
+                    var l;
+
+                    $('.list').empty();
+                    for(i=0; i<o.length; i++){
+                        $('<li>' +  o[i].name + '</li>').appendTo('.list');
+                    }
+
+                    $('li').click(function(){
+                        $('li').removeClass('selected');
+                        $(this).addClass('selected');
+                    });
+                });
+
+                $('.btn-load').click(function(){
+                    if ($('.selected').length !== 0)
+                    {
+                        var user = 'positoy';
+                        var project = $('.selected').html();
+
+                        $('#input_user').val(user);
+                        $('#input_project').val(project);
+                        $('form').submit();
+                    }
+                });
+
+                $('.btn-create').click(function(){
+                    window.location.replace("http://127.0.0.1:3000/create.html");
+                });
+
+                $('.btn-join').click(function(){
+                    window.location.replace("http://127.0.0.1:3000/join.html");
+                });
+            }
+
+            $(document).ready(main);
+        </script>
+    </head>
+    <body>
+        <div id="view">
+
+            <div class="container">
+                <ul class="list">
+                    <li>project1</li>
+                    <li>project2</li>
+                </ul>
+
+                <div class="action">
+                    <button class="btn-load">load</button>
+                    <button class="btn-create">create</button>
+                    <button class="btn-join">join</button>
+                </div>
+
+                <form method="get" action="load.html">
+                    <input id="input_user" name="user" />
+                    <input id="input_project" name="project" />
+                </form>
+            </div>
+
+
+        </div>
+    </body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<link href="css/main.css" rel="stylesheet">
+			<link href="css/jqueryFileTree.css" rel="stylesheet">
+			<script src="lib/jquery.js" type="text/javascript"></script>
+			<script src="lib/jquery.easing.js" type="text/javascript"></script>
+			<script src="lib/jqueryFileTree.js" type="text/javascript"></script>
+			<script src="/ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
+			<script type="text/javascript">
+				$(document).ready(function(){
+					// Ace Editor Object - Ace for Opensource Web Editor
+					var editor;
+
+					// 주소창에서 user와 project를 뽑아서 주소 생성
+					var qs = (function() {
+						var result = {}, queryString = location.search.slice(1),
+						re = /([^&=]+)=([^&]*)/g, m;
+
+						while (m = re.exec(queryString)) {
+							result[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+						}
+
+						return result;
+					})();
+
+					var user_name = qs["user"];
+					var project_name = qs["project"];
+					var d = './user_data/projects/' + project_name + '/_' + user_name + '/';
+
+					// Using jQuery File Tree - fileTree({root : root dir, script : serverside file}, callback func when chosing file})
+					$('#dirtree').fileTree({ root: d, script: 'load' }, function(file) {
+						// When file opening...send data to server with 'post'
+						$.post('openFile', {path : file}, function(data){
+
+							editor = null;
+							// create Ace Editor
+							editor = ace.edit("texteditor");
+							// settings for Ace Editor
+							editor.setTheme('ace/theme/monokai');
+							editor.setShowPrintMargin(false);
+							editor.getSession().setMode("ace/mode/java");
+							document.getElementById("texteditor").style.fontSize = "15px";
+
+							// Change Values when choosing other file
+							editor.setValue(data, 1);
+							//console.log(editor.getValue());
+						});
+					});
+				});
+			</script>
+		</head>
+
+		<body>
+			<div id="container">
+				<div id="dirtree"></div>
+				<div id="texteditor"></div>
+                <div id="controller">
+                    <button id="save">save</button>
+                    <button id="save">refresh</button>
+                    <button id="save">build</button>
+                    
+                    <h3>current user</h3>
+                    <ul>
+                        <li>positoy<br/>(blah.java)</li>
+                        <li>jinwoo<br/>(blahblah.java)</li>
+                    </ul>
+                </div>
+			</div>
+		</body>
+	</html>

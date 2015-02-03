@@ -13,7 +13,7 @@
 					var editor;
 					
 					// Using jQuery File Tree - fileTree({root : root dir, script : serverside file}, callback func when chosing file})
-					$('#dirtree').fileTree({ root: '/home/choidora/Documents/HelloWorld/', script: 'jqueryFileTree_srv.js' }, function(file) { 
+					$('#dirtree').fileTree({ root: '/home/positoy/', script: 'jqueryFileTree_srv.js' }, function(file) { 
 						// When file opening...send data to server with 'post'
 						$.post('openFile', {path : file}, function(data){
 							

@@ -29,6 +29,8 @@ app.get('/', function(req, res){
 
 // method - post //jqueryFileTree_srv.js : request file tree
 app.post('/jqueryFileTree_srv.js', function(req, res){
+
+	console.log("filetree:", req.body);
 	filetree.getDirList(req, res);
 });
 
