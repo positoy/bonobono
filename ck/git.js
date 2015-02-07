@@ -3,16 +3,20 @@ var fs = require('fs');
 var sys = require('sys');
 var exec = require('child_process').exec;
 
-var __userDir = './user_data/projects/';
+var __DIR = './user_data/projects/';
 var __child = null;
 
 // child
 // login, view, create, join, invite
 // load, file reload, save, build, apk, edit, connection
 
-exports.create = function(project) {
+exports.create = function(project_name, user_name, user_email) {
 
-	var goal = "[git] create '" + project + "'";
+	var DIR_PROJECT = __DIR + project_name;
+	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
+
+	var goal = "\n[git] create project '" + project_name + "'";
 	console.log(goal);
 
 	// condition check
@@ -26,16 +30,16 @@ exports.create = function(project) {
 	// "mkdir project" : create new project directory.
 	var task1 = function(callback)
 	{
-		var cmd = "mkdir " + __userDir + project;
+		var cmd = "mkdir " + DIR_PROJECT;
 		var child = exec(cmd, function(error, stdout, stderr) {
 
 			if (error !== null)
 			{
-				sys.puts(error);
+				console.log(error);
 			}
 			else
 			{
-				sys.puts(stdout);
+				console.log("successful: " + cmd);
 				callback(null);
 			}
 		});
@@ -44,16 +48,16 @@ exports.create = function(project) {
 	// "mkdir project/origin" : create new project directory.
 	var task2 = function(callback)
 	{
-		var cmd = "mkdir " + __userDir + project + "/origin";
+		var cmd = "mkdir " + DIR_PROJECT_ORIGIN;
 		var child = exec(cmd, function(error, stdout, stderr) {
 
 			if (error !== null)
 			{
-				sys.puts(error);
+				console.log(error);
 			}
 			else
 			{
-				sys.puts(stdout);
+				console.log("successful: " + cmd);
 				callback(null);
 			}
 		});
@@ -62,21 +66,70 @@ exports.create = function(project) {
 	// "git init" in the created directory.
 	var task3 = function(callback)
 	{
-		var cmd = "git init " + __userDir + project + "/origin";
+		var cmd = "git init " + DIR_PROJECT_ORIGIN;
 		var child = exec(cmd, function(error, stdout, stderr) {
 
 			// directory duplicate must be checked.
 			if (error !== null)
 			{
-				sys.puts(error);
+				console.log(error);
 			}
 			else
 			{
-				sys.puts(stdout);
-				callback(null, true);
+				console.log("successful: " + cmd);
+				callback(null);
 			}
 		});
 	};
+
+	// "git clone" origin project.
+	var task4 = function(callback)
+	{
+		var cmd = "git clone " + DIR_PROJECT_ORIGIN + " " + DIR_PROJECT_USER;
+		var child = exec(cmd, function(error, stdout, stderr) {
+
+			// directory duplicate must be checked.
+			if (error !== null)
+			{
+				console.log(error);
+			}
+			else
+			{
+				console.log("successful: " + cmd);
+				callback(null);
+			}
+		});
+	};
+
+	// "git config --local user.name id"
+	// "git config --local user.email email"
+	// append string
+	// "[user]
+	//  	email = user_email
+	//		name = user_id
+	// "
+	// to '_user/.git/config' file.
+	var task5 = function(callback)
+	{
+		var str1 = "[user]\n";
+		var str2 = "\temail = " + user_email + "\n";
+		var str3 = "\tname = " + user_name + "\n";
+
+		var configFile = DIR_PROJECT_USER + "/.git/config";
+
+		fs.appendFile(configFile, str1+str2+str3, function(err) {
+			if (err)
+			{
+				throw err;
+			}
+			else
+			{
+				console.log("successful: config update.");
+				callback(null, true);
+			}
+		});
+	}
+
 
 	// acknowledge for the "create request"
 	var callback = function(err, result)
@@ -85,25 +138,25 @@ exports.create = function(project) {
 			console.log(goal + " ok.");
 	};
 
-	async.waterfall([task0, task1, task2, task3], callback);
+	async.waterfall([task0, task1, task2, task3, task4, task5], callback);
 };
 
 /****** execute a unix command with node.js MORE CONCISELY **
 
 var sys = require('sys')
 var exec = require('child_process').exec;
-function puts(error, stdout, stderr) { sys.puts(stdout) }
+function puts(error, stdout, stderr) { console.log(stdout) }
 exec("ls -la", puts);
 
 *************************************************************/
 
-exports.join = function(project, id, email) {
+exports.join = function(project_name, user_name, user_email) {
 
-	var projectDir = __userDir + project;
-	var projectDir_origin = projectDir + "/origin";
-	var projectDir_user = projectDir + "/_" + id;
+	var DIR_PROJECT = __DIR + project_name;
+	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
 
-	var goal = "[git] join(clone) '" + project + "' with id '" + id + "'";
+	var goal = "\n[git] join(clone) '" + project_name + "' with id '" + user_name + "'";
 	console.log(goal);
 
 	// condition check
@@ -119,17 +172,17 @@ exports.join = function(project, id, email) {
 	// "git clone" origin project.
 	var task1 = function(callback)
 	{
-		var cmd = "git clone " + projectDir_origin + " " + projectDir_user;
+		var cmd = "git clone " + DIR_PROJECT_ORIGIN + " " + DIR_PROJECT_USER;
 		var child = exec(cmd, function(error, stdout, stderr) {
 
 			// directory duplicate must be checked.
 			if (error !== null)
 			{
-				sys.puts(error);
+				console.log(error);
 			}
 			else
 			{
-				sys.puts(stdout);
+				console.log("successful: " + cmd);
 				callback(null);
 			}
 		});
@@ -146,12 +199,10 @@ exports.join = function(project, id, email) {
 	var task2 = function(callback)
 	{
 		var str1 = "[user]\n";
-		var str2 = "\temail = " + email + "\n";
-		var str3 = "\tname = " + id + "\n";
+		var str2 = "\temail = " + user_email + "\n";
+		var str3 = "\tname = " + user_name + "\n";
 
-
-
-		var configFile = projectDir_user + "/.git/config";
+		var configFile = DIR_PROJECT_USER + "/.git/config";
 
 		fs.appendFile(configFile, str1+str2+str3, function(err) {
 			if (err)
@@ -160,7 +211,7 @@ exports.join = function(project, id, email) {
 			}
 			else
 			{
-				sys.puts("config update.");
+				console.log("successful: config update.");
 				callback(null, true);
 			}
 		});

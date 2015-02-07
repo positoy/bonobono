@@ -1,20 +1,75 @@
 <!doctype html>
 <html>
     <head>
-    <link rel="stylesheet" href="./css/bono.css" />
+        <link rel="stylesheet" href="./css/bono.css" />
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script>
+            var username, password;
+
+            var main = function() {
+                var create = io.connect('http://127.0.0.1:3000/login');
+
+                // 아이디 전송
+                create.on('connect', function(){
+                    console.log('connected');
+                });
+
+                // 프로젝트 정보 받아서 화면 갱신
+                create.on('login_request', function(msg){
+                    
+                    if (msg == 'failure')
+                    {
+                        console.log('사용자 정보가 일치하지 않습니다.');
+                    }
+                    else if (msg == 'success')
+                    {
+                        window.location.href = "./view.html"
+                    }
+                });
+
+                $('.btn-create').click(function(){
+                    
+                    project_name = $('#name').val();
+                    project_desc = $('#desc').val();
+                    
+                    if (project_name.trim() == "" || project_desc.trim() == "")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var o = { user: user_name, project_name : project_name, project_desc : project_desc };
+                        var json = JSON.stringify(o);
+                        console.log(json);
+                        create.emit('create_request', json);
+                    }
+                });
+
+                $('.btn-cancel').click(function(){
+                    window.location.href = "./view.html"
+                });
+            };
+
+            $(document).ready(main);
+        </script>
     </head>
+    <script>
+    
+    </script>
     <body>
         <div id="login">
-        
-            <div class="info">
-                <input class="id" type="text" />
-                <input class="pw" type="password" />
+            <div class="container">
+                <ul>
+                    <li><p>username</p>
+                    <input id="username" type="text" /></li>
+                    <li><p>password</p>
+                    <input id="password" type="password" /></li>
+                    <li><button id="sign in">sign in</button></li>
+                    <li><button id="join" onclick="parent.location='join.html'">join</button></li>
+                </ul>
             </div>
-
-            <div class="confirm">
-                <button class="btn">login</button>
-            </div>
-
         </div>
     </body>
 </html>

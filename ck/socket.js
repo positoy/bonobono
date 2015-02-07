@@ -46,7 +46,13 @@ io.of('/create')
 
       // o.user, o.project.name, o.project.desc
       var o = JSON.parse(j);
-      console.log("[create, " + o.user + "] : request for project '" + o.project.name + "'.")
+
+      var user_name = o.user;
+      var user_email = user_name + "@gmail.com"; // get email forom db using user name
+      var project_name = o.project_name;
+      var project_desc = o.project_desc;
+
+      console.log("[create, " + user_name + "] : request for project '" + project_name + "'")
 
       // DB에서 프로젝트 이름이 중복되는지 확인
       var projectExist = false;
@@ -56,22 +62,13 @@ io.of('/create')
       }
       else
       {
-        //// 1. ORIGIN REPOSITORY 생성
-
-        // git : origin repository 생성
-        git.create(project.name);
-
+        //// ORIGIN REPOSITORY 생성
         // DB에 프로젝트 정보 등록 - db.project.create(project.name, project.desc);
 
-        //// 2. LOCAL REPOSITORY 생성
-        var user_name, user_email;
-        user_name = o.name;
-        user_email = o.name + '@gmail.com'; // db에서 얻어오기
-
-        // git : local repository 생성
-        git.join(o.project.name, user_name, user_email);
-
+        //// LOCAL REPOSITORY 생성
         // DB에 프로젝트 join 정보 등록 - db.userproject.create(user_id, project_name);
+
+        git.create(project_name, user_name, user_email);
 
         socket.emit('create_response', 'success');
       }
@@ -81,6 +78,39 @@ io.of('/create')
 /*********
  JOIN
  ***********/
+io.of('/join')
+  .on('connection', function(socket){
+
+    console.log("[join] : a user connected.")
+
+    socket.on('join_request',function(j){
+
+      // o.user, o.project.name, o.project.desc
+      var o = JSON.parse(j);
+
+      var user_name = o.user;
+      var user_email = user_name + "@gmail.com"; // get email forom db using user name
+      var project_name = o.project_name;
+
+      console.log("[join, " + user_name + "] : request for project '" + project_name + "'")
+
+      // DB에서 프로젝트 이름이 중복되는지 확인
+      var projectExist = false;
+      if (projectExist)
+      {
+        socket.emit('join_response', 'failure');
+      }
+      else
+      {
+        //// LOCAL REPOSITORY 생성
+        // DB에 프로젝트 join 정보 등록 - db.userproject.create(user_id, project_name);
+
+        git.join(project_name, user_name, user_email);
+
+        socket.emit('join_response', 'success');
+      }
+    });
+  });
 
 
 /*********************

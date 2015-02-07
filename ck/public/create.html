@@ -6,8 +6,8 @@
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
         <script>
-            var u_name = 'positoy';
-            var p_name, p_desc;
+            var user_name = 'positoy';
+            var project_name, project_desc;
 
             var main = function() {
                 var create = io.connect('http://127.0.0.1:3000/create');
@@ -15,24 +15,6 @@
                 // 아이디 전송
                 create.on('connect', function(){
                     console.log('connected');
-                });
-            
-                $('.btn-create').click(function(){
-                    
-                    p_name = $('#name').val();
-                    p_desc = $('#desc').val();
-                    
-                    if (p_name.trim() == "" || p_desc.trim() == "")
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        var o = { user: u_name, project : { name: p_name, description: p_desc } };
-                        var j = JSON.stringify(o);
-                        console.log(json);
-//                        create.emit('create_request', j);
-                    }
                 });
 
                 // 프로젝트 정보 받아서 화면 갱신
@@ -44,37 +26,51 @@
                     }
                     else if (msg == 'success')
                     {
-                        // 사용자 이름 구해야함.
-                        // view 화면으로 이동
-                        var url = "http://127.0.0.1/load.html?";
-                        url = url + "user=" + u_name + "&project=" + p_name;
-                        window.location.reload(url);
+                        window.location.href = "./view.html"
+                    }
+                });
+
+                $('.btn-create').click(function(){
+                    
+                    project_name = $('#name').val();
+                    project_desc = $('#desc').val();
+                    
+                    if (project_name.trim() == "" || project_desc.trim() == "")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var o = { user: user_name, project_name : project_name, project_desc : project_desc };
+                        var json = JSON.stringify(o);
+                        console.log(json);
+                        create.emit('create_request', json);
                     }
                 });
 
                 $('.btn-cancel').click(function(){
-                    window.location.replace("http://127.0.0.1:3000/view.html");
+                    window.location.href = "./view.html"
                 });
-            }
+            };
 
             $(document).ready(main);
         </script>
     </head>
     <body>
         <div id="create">
-            <div class="project">
-                <form action="create" method="post">
-                    <ul>
-                        <li>project name<br/>
-                        <input type="text" id="name" name="name"/></li>
+            <div class="container">
+                <ul>
+                    <li>project name<br/>
+                    <input type="text" id="name" name="name"/></li>
 
-                        <li>description<br/>
-                        <textarea id="desc" name="desc"></textarea></li>
-                    </ul>
-                    <button class="btn-create">create</button>
-                    <button class="btn-cancel">cancel</button>
-                </form>
-                </div>
+                    <li>description<br/>
+                    <textarea id="desc" name="desc"></textarea></li>
+
+                    <li><button class="btn-create">create</button></li>
+
+                    <li><button class="btn-cancel">cancel</button></li>
+                </ul>
             </div>
+        </div>
     </body>
 </html>
