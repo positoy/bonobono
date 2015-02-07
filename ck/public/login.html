@@ -25,30 +25,26 @@
                     }
                     else if (msg == 'success')
                     {
-                        window.location.href = "./view.html"
+                        parent.location = "p_view.html"
                     }
                 });
 
-                $('.btn-create').click(function(){
+                $('#btn-signin').click(function(){
                     
-                    project_name = $('#name').val();
-                    project_desc = $('#desc').val();
+                    username = $('#username').val();
+                    password = $('#password').val();
                     
-                    if (project_name.trim() == "" || project_desc.trim() == "")
+                    if (username.trim() == "" || password.trim() == "")
                     {
                         return false;
                     }
                     else
                     {
-                        var o = { user: user_name, project_name : project_name, project_desc : project_desc };
+                        var o = { user: username, password: password };
                         var json = JSON.stringify(o);
                         console.log(json);
-                        create.emit('create_request', json);
+                        create.emit('login_request', json);
                     }
-                });
-
-                $('.btn-cancel').click(function(){
-                    window.location.href = "./view.html"
                 });
             };
 
@@ -66,8 +62,8 @@
                     <input id="username" type="text" /></li>
                     <li><p>password</p>
                     <input id="password" type="password" /></li>
-                    <li><button id="sign in">sign in</button></li>
-                    <li><button id="join" onclick="parent.location='join.html'">join</button></li>
+                    <li><button id="btn-signin">sign in</button></li>
+                    <li><button id="btn-join" onclick="parent.location='join.html'">join</button></li>
                 </ul>
             </div>
         </div>

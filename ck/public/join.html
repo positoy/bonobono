@@ -2,20 +2,77 @@
 <html>
     <head>
     <link rel="stylesheet" href="./css/bono.css" />
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script>
+            var user_name, pw, pwv, email;
+
+            var main = function() {
+                var create = io.connect('http://127.0.0.1:3000/login');
+
+                // 아이디 전송
+                create.on('connect', function(){
+                    console.log('connected');
+                });
+
+                create.on('login_response', function(msg){
+                    
+                    if (msg == 'failure')
+                    {
+                        console.log('회원가입할 수 없습니다.');
+                    }
+                    else if (msg == 'success')
+                    {
+                        parent.location = 'login.html';
+                    }
+                });
+
+                $('#join').click(function(){
+                    
+                    user_name = $('#name').val();
+                    pw = $('#pw1').val();
+                    pwv = $('#pw2').val();
+                    email = $('#email').val();
+                    
+                    if (user_name.trim() !== "")
+                    {
+                        
+                    }
+                    else if (pw !== pwv)
+                    {
+                        console.log("password not correct");
+                        // 애니메이션 추가
+                        
+                    }
+                    else if (email.trim() !== "")
+                    {
+                        // finallY!
+                        
+                        var o = { user: user_name, password: pw, email: email };
+                        var json = JSON.stringify(o);
+                        console.log(json);
+                        join.emit('join_request', json);
+                    }
+            };
+
+            $(document).ready(main);
+        </script>
     </head>
     <body>
         <div id="login">
             <div class="container">
                 <ul>
                     <li><p>username</p>
-                        <input id="id" type="text" /></li>
+                        <input id="name" type="text" /></li>
                     <li><p>password</p>
                         <input id="pw1" type="password" /></li>
-                    <li><input id="pw2" type="password" /></li>
+                    <li><p>password verification</p>
+                        <input id="pw2" type="password" /></li>
                     <li><p>email</p>
                     <input id="email" type="text" /></li>
                     <li><button id="join">join now</button></li>
-                    <li><button id="cancel">cancel</button></li>
+                    <li><button id="cancel" onclick="parent.location='login.html'">cancel</button></li>
                 </ul>
             </div>
         </div>

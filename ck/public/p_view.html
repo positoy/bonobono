@@ -44,11 +44,11 @@
                 });
 
                 $('.btn-create').click(function(){
-                    window.location.replace("http://127.0.0.1:3000/create.html");
+                    parent.location = 'p_create.html';
                 });
 
                 $('.btn-join').click(function(){
-                    window.location.replace("http://127.0.0.1:3000/join.html");
+                    parent.location = 'p_join.html';
                 });
             }
 
@@ -70,7 +70,7 @@
                     <button class="btn-join">join</button>
                 </div>
 
-                <form method="get" action="load.html">
+                <form method="get" action="p_load.html">
                     <input id="input_user" name="user" />
                     <input id="input_project" name="project" />
                 </form>

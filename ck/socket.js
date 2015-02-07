@@ -18,6 +18,75 @@ var git = require('./git.js');
 // global variables
 
 /*************
+ LOGIN
+ *************/
+io.of('/login')
+  .on('connection', function(socket){
+
+    console.log("[login] : a user connected.")
+
+    socket.on('login_request',function(json){
+
+      var o = JSON.parse(json);
+
+      console.log("[login, " + o.username + "] : json requested.");
+
+      // verify user id and password using db
+      var login_successful = null;
+
+      if (login_successful)
+      {
+        socket.emit('login_response', 'success');
+      }
+      else
+      {
+        socket.emit('login_response', 'failure');
+      }
+    });
+  });
+
+
+/*************
+ JOIN
+ *************/
+io.of('/join')
+  .on('connection', function(socket){
+
+    console.log("[join] : a user connected.")
+
+    socket.on('join_request',function(json){
+
+      var o = JSON.parse(json);
+
+      console.log("[join, " + o.user + "] : json requested.");
+
+      // DB : check if o.user already exists
+      var same_id_exist = null;
+
+      if (same_id_exist)
+      {
+        socket.emit('id_exists', "1");
+      }
+      else
+      {
+        // DB : create a new record for user
+        var join_successful = null;
+
+        if (join_successful)
+        {
+          socket.emit('join_response', 'success');
+        }
+        else
+        {
+          socket.emit('join_response', 'failure');
+        }
+      }
+    });
+  });
+
+
+
+/*************
  VIEW
  *************/
 io.of('/view')
