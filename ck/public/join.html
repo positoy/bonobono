@@ -9,14 +9,14 @@
             var user_name, pw, pwv, email;
 
             var main = function() {
-                var create = io.connect('http://127.0.0.1:3000/login');
+                var create = io.connect('http://127.0.0.1:3000/join');
 
                 // 아이디 전송
                 create.on('connect', function(){
                     console.log('connected');
                 });
 
-                create.on('login_response', function(msg){
+                create.on('join_response', function(msg){
                     
                     if (msg == 'failure')
                     {

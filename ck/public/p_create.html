@@ -10,7 +10,7 @@
             var project_name, project_desc;
 
             var main = function() {
-                var create = io.connect('http://127.0.0.1:3000/create');
+                var create = io.connect('http://127.0.0.1:3000/p_create');
 
                 // 아이디 전송
                 create.on('connect', function(){
@@ -18,7 +18,7 @@
                 });
 
                 // 프로젝트 정보 받아서 화면 갱신
-                create.on('create_response', function(msg){
+                create.on('p_create_response', function(msg){
                     
                     if (msg == 'failure')
                     {
@@ -44,7 +44,7 @@
                         var o = { user: user_name, project_name : project_name, project_desc : project_desc };
                         var json = JSON.stringify(o);
                         console.log(json);
-                        create.emit('create_request', json);
+                        create.emit('p_create_request', json);
                     }
                 });
 

@@ -7,16 +7,16 @@
         <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
         <script>
             var main = function() {
-                var view = io.connect('http://127.0.0.1:3000/view');
+                var view = io.connect('http://127.0.0.1:3000/p_view');
 
                 // 아이디 전송
                 view.on('connect', function(){
                     console.log('connected');
-                    view.emit('pinfo_request', 'positoy');
+                    view.emit('p_view_request', 'positoy');
                 });
 
                 // 프로젝트 정보 받아서 화면 갱신
-                view.on('pinfo_response', function(j){
+                view.on('p_view_response', function(j){
                     var o = JSON.parse(j);
                     var l;
 
@@ -70,7 +70,7 @@
                     <button class="btn-join">join</button>
                 </div>
 
-                <form method="get" action="p_load.html">
+                <form method="get" action="p_load">
                     <input id="input_user" name="user" />
                     <input id="input_project" name="project" />
                 </form>

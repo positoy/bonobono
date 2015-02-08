@@ -87,31 +87,31 @@ io.of('/join')
 
 
 /*************
- VIEW
+ PROJECT VIEW
  *************/
-io.of('/view')
+io.of('/p_view')
   .on('connection', function(socket){
 
-    console.log("[view] : a user connected.")
+    console.log("[project view] : a user connected.")
 
-    socket.on('pinfo_request',function(id){
-      console.log("[view, " + id + "] : json requested.");
+    socket.on('p_view_request',function(id){
+      console.log("[project view, " + id + "] : json requested.");
       // DB에서 id의 모든 프로젝트를 조회해서 json으로 전송해준다.
       var j = '[{"name":"bono","description":"awesome project"},{"name":"happy_project","description":"you will be happy"}]';
 
-      socket.emit('pinfo_response', j);
+      socket.emit('p_view_response', j);
     });
   });
 
 /************
- CREATE
+ PROJECT CREATE
  ************/
-io.of('/create')
+io.of('/p_create')
   .on('connection', function(socket){
 
-    console.log("[create] : a user connected.")
+    console.log("[project create] : a user connected.")
 
-    socket.on('create_request',function(j){
+    socket.on('p_create_request',function(j){
 
       // o.user, o.project.name, o.project.desc
       var o = JSON.parse(j);
@@ -121,13 +121,13 @@ io.of('/create')
       var project_name = o.project_name;
       var project_desc = o.project_desc;
 
-      console.log("[create, " + user_name + "] : request for project '" + project_name + "'")
+      console.log("[project create, " + user_name + "] : request for project '" + project_name + "'")
 
       // DB에서 프로젝트 이름이 중복되는지 확인
       var projectExist = false;
       if (projectExist)
       {
-        socket.emit('create_response', 'failure');
+        socket.emit('p_create_response', 'failure');
       }
       else
       {
@@ -139,20 +139,20 @@ io.of('/create')
 
         git.create(project_name, user_name, user_email);
 
-        socket.emit('create_response', 'success');
+        socket.emit('p_create_response', 'success');
       }
     });
   });
 
 /*********
- JOIN
+ PROJECT JOIN
  ***********/
-io.of('/join')
+io.of('/p_join')
   .on('connection', function(socket){
 
-    console.log("[join] : a user connected.")
+    console.log("[project join] : a user connected.")
 
-    socket.on('join_request',function(j){
+    socket.on('p_join_request',function(j){
 
       // o.user, o.project.name, o.project.desc
       var o = JSON.parse(j);
@@ -161,13 +161,13 @@ io.of('/join')
       var user_email = user_name + "@gmail.com"; // get email forom db using user name
       var project_name = o.project_name;
 
-      console.log("[join, " + user_name + "] : request for project '" + project_name + "'")
+      console.log("[project join, " + user_name + "] : request for project '" + project_name + "'")
 
       // DB에서 프로젝트 이름이 중복되는지 확인
       var projectExist = false;
       if (projectExist)
       {
-        socket.emit('join_response', 'failure');
+        socket.emit('p_join_response', 'failure');
       }
       else
       {
@@ -176,25 +176,25 @@ io.of('/join')
 
         git.join(project_name, user_name, user_email);
 
-        socket.emit('join_response', 'success');
+        socket.emit('p_join_response', 'success');
       }
     });
   });
 
 
 /*********************
- LOAD
+ PROJECT LOAD
  *********************/
 var filetree = require('./lib/jqueryFileTree_srv.js');
 
-app.post('/load', function(req, res){
-  console.log("/load : " + req.body.dir);
+app.post('/p_load', function(req, res){
+  console.log("[project load] : " + req.body.dir);
   filetree.getDirList(req, res);
 });
 
 app.post('/openFile', function(req, res){
   var filePath = req.body.path;
-  console.log("/openFile : " + filePath);
+  console.log("[open file] : " + filePath);
 
   fs.readFile(filePath, 'utf-8', function(err, data){
     res.send(data);

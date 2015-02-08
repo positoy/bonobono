@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./css/bono.css" />
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script>
+            var user, project;
+
+            var main = function() {
+                var create = io.connect('http://127.0.0.1:3000/p_join');
+
+                // 아이디 전송
+                create.on('connect', function(){
+                    console.log('connected');
+                });
+
+                // 프로젝트 정보 받아서 화면 갱신
+                create.on('p_join_response', function(msg){
+                    
+                    if (msg == 'failure')
+                    {
+                        console.log('failed to join project.');
+                    }
+                    else if (msg == 'success')
+                    {
+                        parent.location = "p_view.html"
+                    }
+                });
+
+                $('#btn-signin').click(function(){
+                    
+                    user = 'positoy'; // use session
+                    project = $('#project_name').val();
+                    
+                    if (project_name.trim() !=== "")
+                    {
+                        var o = { user: user, project: project };
+                        var json = JSON.stringify(o);
+                        console.log(json);
+                        create.emit('p_join_request', json);
+                    }
+                });
+            };
+
+            $(document).ready(main);
+        </script>
+    </head>
+    <body>
+        <div id="join">
+            <div class="container">
+                <p>project name</p>
+                <input type="text" id="project_name"/>
+                <button class="btn-join">join</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
