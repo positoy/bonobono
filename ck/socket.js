@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // bonobono modules
 var git = require('./git.js');
+var db = require('./db.js')();
 
 
 // global variables
@@ -29,19 +30,23 @@ io.of('/login')
 
       var o = JSON.parse(json);
 
-      console.log("[login, " + o.username + "] : json requested.");
+      console.log("[login, " + o.user + "] : login request.");
 
-      // verify user id and password using db
-      var login_successful = null;
+      // for db
+      // handler
+      function login_handler(login_successful, socket)
+      {
+        var socket = socket;
 
-      if (login_successful)
-      {
-        socket.emit('login_response', 'success');
+        if (login_successful) {
+          socket.emit('login_response', 'success');
+        } else {
+          socket.emit('login_response', 'failure');
+        }
       }
-      else
-      {
-        socket.emit('login_response', 'failure');
-      }
+
+      // execute db
+      db.user.login(o.user, o.password, login_handler, socket);
     });
   });
 

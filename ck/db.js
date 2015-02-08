@@ -11,7 +11,7 @@ module.exports = function() {
 		host : 'localhost',	//**********이부분 체크
 		port : 3306,		//mysql 통신포트
 		user : 'root',
-		password : 'mahabono',
+		password : 'bonobono',
 		database : 'mainbono'
 	});
 
@@ -59,23 +59,23 @@ function create_ (_id, _pw, _email) {
  LOGIN
  : 사용자 login 기능 
 **************************/
-function login_ (_id, _pw) {
+function login_ (_id, _pw, login_handler, socket) {
 	var query = connection.query("SELECT user_id FROM userinfo WHERE user_id = ? AND pw = ?"
 				, [_id,_pw], function(err,rows) {
 		if(err) {
-			console.log("login query error");
+			console.log("[login] : DB ERROR");
 			console.error(err);
 			//throw err;
 			return;
 		} else {
-			console.log("LOGIN SUCCESS -------- 1. query ok");
-			console.log(query.sql);
-			if(rows == 0) {
-				console.log("Nothing was found.");
+			console.log("[login] : ", query.sql);
+
+			if(rows.length == 0) {
+				console.log("[login] : login failed.")
+				login_handler(false, socket);
 			} else {
-				console.log("LOGIN SUCCESS -------- 2. found id");
-				console.log(rows);
-				console.log(rows[0]['user_id']);	//가장 처음 찾아지는 아이디를 찍어라.
+				console.log("[login] : login successful.")
+				login_handler(true, socket);
 			}
 		}
 	});
@@ -86,6 +86,8 @@ function login_ (_id, _pw) {
  : 사용자 project 조회 기능 
 **************************/
 function view_ (_id) {
+
+	var projectList = [];
 	var query = connection.query("SELECT * FROM userproject WHERE user_id = ?", _id, function(err,rows) {
 		if(err) {
 			console.log("view query error");
@@ -93,11 +95,16 @@ function view_ (_id) {
 			//throw err;
 			return;
 		} else {
+			var projectList = [];
+
 			for(idx in rows) {
 				console.log("User's project: "+ rows[idx]['project']);
+				projectList.push(rows[idx]['project']);
 			}
 		}
 	});
+
+	return projectList;
 }
 
 /*************************

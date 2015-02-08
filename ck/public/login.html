@@ -17,19 +17,20 @@
                 });
 
                 // 프로젝트 정보 받아서 화면 갱신
-                create.on('login_request', function(msg){
+                create.on('login_response', function(msg){
                     
                     if (msg == 'failure')
                     {
-                        console.log('사용자 정보가 일치하지 않습니다.');
+                        console.log("recv", "login_response", "failure");
                     }
                     else if (msg == 'success')
                     {
+                        console.log("recv", "login_response", "success");
                         parent.location = "p_view.html"
                     }
                 });
 
-                $('#btn-signin').click(function(){
+                $('#btn-login').click(function(){
                     
                     username = $('#username').val();
                     password = $('#password').val();
@@ -42,8 +43,8 @@
                     {
                         var o = { user: username, password: password };
                         var json = JSON.stringify(o);
-                        console.log(json);
                         create.emit('login_request', json);
+                        console.log("send", "login_request");
                     }
                 });
             };
@@ -62,7 +63,7 @@
                     <input id="username" type="text" /></li>
                     <li><p>password</p>
                     <input id="password" type="password" /></li>
-                    <li><button id="btn-signin">sign in</button></li>
+                    <li><button id="btn-login">login</button></li>
                     <li><button id="btn-join" onclick="parent.location='join.html'">join</button></li>
                 </ul>
             </div>
