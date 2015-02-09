@@ -120,25 +120,6 @@ function view_ (_id) {
 }
 
 /*************************
- NOTIFICATION_FLAG
- : 사용자 inv_noti_flag 조작 
-**************************/
-function invite_notification_flag_(_id, _change) {
-	var query = connection.query("UPDATE userinfo invite_notification = ? WHERE user_id = ?"
-		, [_change,_id], function(err,rows) {
-	if(err) {
-		console.log("invite_notification_flag query error");
-		console.error(err);
-		throw err;
-	} else {
-		console.log(_id + " :userinfo's invite_notification is changed: " + _change);
-	}
-
-	});
-}
-
-
-/*************************
  CREATE_PROJECT
  : project 추가 기능 
 **************************/
@@ -155,6 +136,25 @@ function create_project_ (_projname, _desc) {
 	});
 }
 
+
+/*************************
+ NOTIFICATION_FLAG
+ : 사용자 inv_noti_flag 조작 
+**************************/
+function invite_notification_flag_(_id, _change) {
+	var query = connection.query("UPDATE userinfo SET invite_notification = '?' WHERE user_id = ? "
+		, [_change,_id], function(err,rows) {
+	if(err) {
+		console.log("invite_notification_flag query error");
+		console.error(err);
+		throw err;
+	} else {
+		console.log(_id + " :userinfo's invite_notification is changed: " + _change);
+	}
+
+	});
+}
+
 /*************************
  INVITE
  : 타 사용자 초대 기능 
@@ -168,6 +168,7 @@ function invite_ (_inviting_id, _invited_id, _inv_project, _inv_msg) {
 			console.error(err);
 			throw err;
 		} else {
+			invite_notification_flag_(_invited_id, 1);
 			console.log( _inviting_id + " invited " + _invited_id + " in " + _inv_project + " says " + _inv_msg);			
 		}
 	});
