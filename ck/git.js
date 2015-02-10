@@ -10,7 +10,7 @@ var __child = null;
 // login, view, create, join, invite
 // load, file reload, save, build, apk, edit, connection
 
-exports.create = function(project_name, user_name, user_email) {
+exports.create = function(project_name, user_name, user_email, handler) {
 
 	var DIR_PROJECT = __DIR + project_name;
 	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
@@ -130,12 +130,11 @@ exports.create = function(project_name, user_name, user_email) {
 		});
 	}
 
-
 	// acknowledge for the "create request"
 	var callback = function(err, result)
 	{
 		if (result === true)
-			console.log(goal + " ok.");
+			handler();
 	};
 
 	async.waterfall([task0, task1, task2, task3, task4, task5], callback);
@@ -150,7 +149,7 @@ exec("ls -la", puts);
 
 *************************************************************/
 
-exports.join = function(project_name, user_name, user_email) {
+exports.join = function(project_name, user_name, user_email, handler) {
 
 	var DIR_PROJECT = __DIR + project_name;
 	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
@@ -221,7 +220,7 @@ exports.join = function(project_name, user_name, user_email) {
 	var callback = function(err, result)
 	{
 		if (result === true)
-			console.log(goal + " ok.");
+			handler();
 	};
 
 	async.waterfall([task0, task1, task2], callback);

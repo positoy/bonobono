@@ -26,7 +26,7 @@
                     }
                     else if (msg == 'success')
                     {
-                        window.location.href = "./view.html"
+                        parent.location = "p_view.html"
                     }
                 });
 
@@ -41,8 +41,7 @@
                     }
                     else
                     {
-                        var o = { user: user_name, project_name : project_name, project_desc : project_desc };
-                        var json = JSON.stringify(o);
+                        var json = JSON.stringify({ user_name: user_name, project_name : project_name, project_desc : project_desc });
                         console.log(json);
                         create.emit('p_create_request', json);
                     }

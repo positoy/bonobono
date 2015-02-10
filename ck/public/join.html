@@ -6,17 +6,17 @@
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
         <script>
-            var user_name, pw, pwv, email;
+            var user_name, password, password_verification, email;
 
             var main = function() {
-                var create = io.connect('http://127.0.0.1:3000/join');
+                var join = io.connect('http://127.0.0.1:3000/join');
 
                 // 아이디 전송
-                create.on('connect', function(){
+                join.on('connect', function(){
                     console.log('connected');
                 });
 
-                create.on('join_response', function(msg){
+                join.on('join_response', function(msg){
                     
                     if (msg == 'failure')
                     {
@@ -31,30 +31,41 @@
                 $('#join').click(function(){
                     
                     user_name = $('#name').val();
-                    pw = $('#pw1').val();
-                    pwv = $('#pw2').val();
+                    password = $('#pw1').val();
+                    password_verification = $('#pw2').val();
                     email = $('#email').val();
                     
-                    if (user_name.trim() !== "")
+                    if (user_name.trim() === "")
                     {
-                        
+                        console.log("enter id");
                     }
-                    else if (pw !== pwv)
+                    else if (password.trim() === "")
+                    {
+                        console.log("enter password");
+                    }
+                    else if (password !== password_verification)
                     {
                         console.log("password not correct");
                         // 애니메이션 추가
                         
                     }
-                    else if (email.trim() !== "")
+                    else if (email.trim() === "")
+                    {
+                        console.log("enter email");
+                    }
+                    else
                     {
                         // finallY!
-                        
-                        var o = { user: user_name, password: pw, email: email };
-                        var json = JSON.stringify(o);
+                        var json = JSON.stringify({
+                            user: user_name,
+                            password: password,
+                            email: email
+                        });
                         console.log(json);
                         join.emit('join_request', json);
                     }
-            };
+                });
+            }
 
             $(document).ready(main);
         </script>

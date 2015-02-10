@@ -63,32 +63,26 @@ io.of('/join')
 
       var o = JSON.parse(json);
 
-      console.log("[join, " + o.user + "] : json requested.");
+      console.log("[join, " + o.user + "] : join requested.");
 
-      // DB : check if o.user already exists
-      var same_id_exist = null;
-
-      if (same_id_exist)
+      // for db
+      // handler
+      function join_handler(join_successful, socket)
       {
-        socket.emit('id_exists', "1");
-      }
-      else
-      {
-        // DB : create a new record for user
-        var join_successful = null;
+        var socket = socket;
 
-        if (join_successful)
-        {
+        if (join_successful) {
           socket.emit('join_response', 'success');
-        }
-        else
-        {
+        } else {
           socket.emit('join_response', 'failure');
         }
       }
+
+      // execute db
+      db.user.create(o.user, o.password, o.email, join_handler, socket);
+
     });
   });
-
 
 
 /*************
@@ -97,16 +91,31 @@ io.of('/join')
 io.of('/p_view')
   .on('connection', function(socket){
 
-    console.log("[project view] : a user connected.")
+    console.log("[project view] : a user connected.");
 
     socket.on('p_view_request',function(id){
-      console.log("[project view, " + id + "] : json requested.");
-      // DB에서 id의 모든 프로젝트를 조회해서 json으로 전송해준다.
-      var j = '[{"name":"bono","description":"awesome project"},{"name":"happy_project","description":"you will be happy"}]';
+      console.log("[project view, " + id + "] : project list request.");
 
-      socket.emit('p_view_response', j);
+      // for db
+      // project list handler
+      function pview_handler(pview_successful, socket, str_projectList)
+      {
+        var socket = socket;
+
+        if (pview_successful) {
+          socket.emit('p_view_response', str_projectList);
+
+        } else {
+          socket.emit('p_view_response', 'failure');
+
+        }
+      }
+
+      // execute db
+      db.user.view(id, pview_handler, socket);
     });
   });
+
 
 /************
  PROJECT CREATE
@@ -118,34 +127,34 @@ io.of('/p_create')
 
     socket.on('p_create_request',function(j){
 
-      // o.user, o.project.name, o.project.desc
+      // o.user_name, o.project_name, o.project_desc
       var o = JSON.parse(j);
 
-      var user_name = o.user;
-      var user_email = user_name + "@gmail.com"; // get email forom db using user name
-      var project_name = o.project_name;
-      var project_desc = o.project_desc;
+      console.log("[project create, " + o.user_name + "] : project create request, " + o.project_name)
 
-      console.log("[project create, " + user_name + "] : request for project '" + project_name + "'")
+      // 0. db : check project name duplicate
+      // 1. db : get user email
+      // 2. git : new project (create origin folder and git init)
+      // 3. db : add new project
+      // 4. git : join project (create folder and git clone)
+      // 5. db : add userproject
 
-      // DB에서 프로젝트 이름이 중복되는지 확인
-      var projectExist = false;
-      if (projectExist)
+      // for db
+      // project list handler
+      function pcreate_handler(pcreate_successful, socket)
       {
-        socket.emit('p_create_response', 'failure');
+        var socket = socket;
+
+        if (pcreate_successful) {
+          socket.emit('p_create_response', 'success');
+
+        } else {
+          socket.emit('p_create_response', 'failure');
+
+        }
       }
-      else
-      {
-        //// ORIGIN REPOSITORY 생성
-        // DB에 프로젝트 정보 등록 - db.project.create(project.name, project.desc);
 
-        //// LOCAL REPOSITORY 생성
-        // DB에 프로젝트 join 정보 등록 - db.userproject.create(user_id, project_name);
-
-        git.create(project_name, user_name, user_email);
-
-        socket.emit('p_create_response', 'success');
-      }
+      db.user.create_project(o, pcreate_handler, socket);
     });
   });
 
@@ -155,36 +164,36 @@ io.of('/p_create')
 io.of('/p_join')
   .on('connection', function(socket){
 
-    console.log("[project join] : a user connected.")
+    console.log("[join project] : a user connected.")
 
     socket.on('p_join_request',function(j){
 
       // o.user, o.project.name, o.project.desc
       var o = JSON.parse(j);
 
-      var user_name = o.user;
-      var user_email = user_name + "@gmail.com"; // get email forom db using user name
-      var project_name = o.project_name;
+      console.log("[join project, " + user_name + "] : request for project '" + project_name + "'")
 
-      console.log("[project join, " + user_name + "] : request for project '" + project_name + "'")
+      // 0. db : 프로젝트가 존재하는지 검사
+      // 1. db : 사용자의 이메일주소 받아오기
+      // 2. git : 폴더생성 & git clone
+      // 3. db : insert into userproject
 
-      // DB에서 프로젝트 이름이 중복되는지 확인
-      var projectExist = false;
-      if (projectExist)
+      function pjoin_handler(pjoin_successful, socket)
       {
-        socket.emit('p_join_response', 'failure');
-      }
-      else
-      {
-        //// LOCAL REPOSITORY 생성
-        // DB에 프로젝트 join 정보 등록 - db.userproject.create(user_id, project_name);
+        var socket = socket;
 
-        git.join(project_name, user_name, user_email);
+        if (pjoin_successful) {
+          socket.emit('p_create_response', 'success');
 
-        socket.emit('p_join_response', 'success');
+        } else {
+          socket.emit('p_create_response', 'failure');
+        }
       }
+
+      db.user.join_project(o, pjoin_handler,socket);
     });
   });
+
 
 
 /*********************
@@ -205,7 +214,6 @@ app.post('/openFile', function(req, res){
     res.send(data);
   });
 });
-
 
 
 /**************
