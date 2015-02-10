@@ -220,7 +220,7 @@ exports.join = function(project_name, user_name, user_email, handler) {
 	var callback = function(err, result)
 	{
 		if (result === true)
-			handler();
+			final_handler();
 	};
 
 	async.waterfall([task0, task1, task2], callback);

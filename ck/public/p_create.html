@@ -6,7 +6,7 @@
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
         <script>
-            var user_name = 'positoy';
+            var user_name = 'chgyubono';
             var project_name, project_desc;
 
             var main = function() {
@@ -35,9 +35,13 @@
                     project_name = $('#name').val();
                     project_desc = $('#desc').val();
                     
-                    if (project_name.trim() == "" || project_desc.trim() == "")
+                    if (project_name.trim() == "")
                     {
-                        return false;
+                        console.log("enter project name.")
+                    }
+                    else if(project_desc.trim() == "")
+                    {
+                        console.log("enter project description.")
                     }
                     else
                     {

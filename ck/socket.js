@@ -166,12 +166,11 @@ io.of('/p_join')
 
     console.log("[join project] : a user connected.")
 
-    socket.on('p_join_request',function(j){
+    socket.on('p_join_request',function(json){
 
       // o.user, o.project.name, o.project.desc
-      var o = JSON.parse(j);
-
-      console.log("[join project, " + user_name + "] : request for project '" + project_name + "'")
+      var o = JSON.parse(json);
+      console.log("[join project, " + o.user_name + "] : request for project '" + o.project_name + "'")
 
       // 0. db : 프로젝트가 존재하는지 검사
       // 1. db : 사용자의 이메일주소 받아오기
@@ -183,10 +182,10 @@ io.of('/p_join')
         var socket = socket;
 
         if (pjoin_successful) {
-          socket.emit('p_create_response', 'success');
+            socket.emit('p_join_response', 'success');
 
         } else {
-          socket.emit('p_create_response', 'failure');
+            socket.emit('p_join_response', 'failure');
         }
       }
 

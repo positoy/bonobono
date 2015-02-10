@@ -170,7 +170,7 @@ function join_project_ (obj, pjoin_handler, socket) {
 
 	// 0. db : 프로젝트가 존재하는지 검사
 	var query = connection.query("SELECT project_name FROM projectinfo WHERE project_name=?", obj.project_name,
-		function(err,result) {
+		function(err, rows) {
 			if(err) {
 				console.log("[join project] 0.db.project_existence_check.error");
 				console.error(err);
@@ -178,7 +178,7 @@ function join_project_ (obj, pjoin_handler, socket) {
 
 			} else {
 
-				if (result.length == 0)
+				if (rows.length == 0)
 				{
 					console.log("[join project] 0.db.project_existence_check.no_project");
 					pjoin_handler(false, socket);
@@ -190,7 +190,7 @@ function join_project_ (obj, pjoin_handler, socket) {
 
 					// 1. db : 사용자의 이메일주소 받아오기
 					var query = connection.query("SELECT email FROM userinfo WHERE user_id=?", obj.user_name,
-						function(err,rows) {
+						function(err, rows) {
 							if(err) {
 								console.log("[join project] 0.db.get_user_email.error");
 								console.error(err);
@@ -201,13 +201,13 @@ function join_project_ (obj, pjoin_handler, socket) {
 								console.log("[join project] 0.db.get_user_email.successful");
 
 								// 2. git : 폴더생성 & git clone
-								git.user.join(obj.project_name, obj.user_name, obj.user_email, handler);
+								git.join(obj.project_name, obj.user_name, obj.user_email, handler);
 
 								function handler()
 								{
 									// 3. db : insert into userproject
 									var query = connection.query("INSERT INTO userproject(user_id, project) VALUES (?, ?)", [obj.user_name, obj.project_name],
-										function(err,result) {
+										function(err, result) {
 											if(err) {
 												console.log("[join project] 0.db.insert_userproject.error");
 												console.error(err);

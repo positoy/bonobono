@@ -6,8 +6,8 @@
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
         <script>
-            var user = 'positoy';
-            var project;
+            var user_name = 'chgyubono'; // 세션에서 얻어야 함
+            var project_name;
 
             var main = function() {
                 var pjoin = io.connect('http://127.0.0.1:3000/p_join');
@@ -32,12 +32,15 @@
 
                 $('#btn-join').click(function(){
 
-                    user = 'positoy'; // use session
-                    project = $('#project_name').val();
+                    project_name = $('#project_name').val();
 
-                    if (project_name.trim() !== "")
+                    if (project_name.trim() === "")
                     {
-                        var json = JSON.stringify({ user_name: user, project_name: project });
+                        console.log("enter project name.")
+                    }
+                    else
+                    {
+                        var json = JSON.stringify({ user_name: user_name, project_name: project_name });
                         console.log(json);
                         pjoin.emit('p_join_request', json);
                     }
@@ -52,7 +55,7 @@
             <div class="container">
                 <p>project name</p>
                 <input type="text" id="project_name"/>
-                <button class="btn-join">join</button>
+                <button id="btn-join">join</button>
                 </div>
             </div>
         </div>
