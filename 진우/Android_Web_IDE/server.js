@@ -21,16 +21,65 @@ app.use(express.Router());
 
 // method - get /
 app.get('/', function(req, res){
-	console.log('### User Request : Get ###');
+	fs.readFile('login.html', function(err, data){
+		res.send(data.toString());
+	});
+});
+
+// method - get /main
+app.get('/main', function(req, res){
+	var user_id = req.param("id");
+	//console.log('user id : ' + user_id);
 	fs.readFile('main.html', function(err, data){
 		res.send(data.toString());
 	});
 });
 
-// method - post //jqueryFileTree_srv.js : request file tree
-app.post('/jqueryFileTree_srv.js', function(req, res){
+// method - get /select_project
+app.get('/select_project', function(req, res){
+	var user_id = req.param("id");
+	//console.log('user id : ' + user_id);
+	
+	fs.readdir("/home/choidora/Documents/test_folder", function(err, files){
+/*
+		for(var i in files){
+			console.log(files[i]);
+		}
+*/
+		res.send(files);
+	});
+});
 
-	console.log("filetree:", req.body);
+// method - get /login
+app.post('/login', function(req, res){
+	var user_id = req.body.id;
+	var user_pwd = req.body.pwd;
+	
+	if(user_id == "cwlsn88" && user_pwd == "cwlsn88"){
+		//console.log("login complete");
+		res.send("login_successed");
+	}
+	else{
+		//console.log("login failed");
+		res.send("login_failed");
+	}
+});
+
+// method = post /file_save : save file when client press 'Ctrl + S'
+app.post('/file_save', function(req, res){
+	var fileName = req.body.fileName;
+	var contents = req.body.contents;
+	
+	fs.writeFile(fileName, contents, 'utf8', function(err){
+		if(err) throw err;
+		console.log("### Save Complete ###");
+	});
+	
+	res.sendStatus(200);
+});
+
+// method - post /req_filetree : request file tree
+app.post('/req_filetree', function(req, res){
 	filetree.getDirList(req, res);
 });
 
@@ -38,10 +87,14 @@ app.post('/jqueryFileTree_srv.js', function(req, res){
 app.post('/openFile', function(req, res){
 	var filePath = req.body.path;
 	
-	fs.readFile(filePath, 'utf-8', function(err, data){
-		//console.log(data);
-		res.send(data);
-	});
+	//console.log(filePath);
+	
+	if(filePath){
+		fs.readFile(filePath, 'utf-8', function(err, data){
+			//console.log(data);
+			res.send(data);
+		});	
+	}
 });
 
 // server start listening

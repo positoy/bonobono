@@ -8,6 +8,9 @@ var fs = require('fs');
 
 var _getDirList = function(request, response) {
 	var dir = request.body.dir;
+	var dirArr = new Array();
+	var fileArr = new Array();
+	
 	var r = '<ul class="jqueryFileTree" style="display: none;">';
    	try {
        	r = '<ul class="jqueryFileTree" style="display: none;">';
@@ -16,18 +19,22 @@ var _getDirList = function(request, response) {
 			var ff = dir + f;
 			var stats = fs.statSync(ff);
             if (stats.isDirectory()) { 
-                r += '<li class="directory collapsed"><a href="#" rel="' + ff  + '/">' + f + '</a></li>';
+            	dirArr.push('<li class="directory collapsed"><a href="#" rel="' + ff  + '/">' + f + '</a></li>');	
+                // r += '<li class="directory collapsed"><a href="#" rel="' + ff  + '/">' + f + '</a></li>';
             } else {
             	var e = f.split('.')[1];
-             	r += '<li class="file ext_' + e + '"><a href="#" rel='+ ff + '>' + f + '</a></li>';
+            	fileArr.push('<li class="file ext_' + e + '"><a href="#" rel='+ ff + '>' + f + '</a></li>');
+             	// r += '<li class="file ext_' + e + '"><a href="#" rel='+ ff + '>' + f + '</a></li>';
             }
 		});
+		for(var i in dirArr)			r += dirArr[i];
+		for(var i in fileArr)    	r += fileArr[i];
 		r += '</ul>';
 	} catch(e) {
 		r += 'Could not load directory: ' + dir;
 		r += '</ul>';
 	}
-	response.send(r)
-}
+	response.send(r);
+};
 
 module.exports.getDirList = _getDirList;
