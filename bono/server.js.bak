@@ -1,5 +1,7 @@
+var http = require('http');
 var fs = require('fs');
 var path = require('path');
+
 
 // BONOBONO MODULES
 var db = require('./db.js')();
@@ -22,9 +24,6 @@ app.use(serve_static(__dirname));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.Router());
 
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-
 // method - get /
 app.get('/', function(req, res){
 	fs.readFile('login.html', function(err, data){
@@ -45,7 +44,7 @@ app.get('/main', function(req, res){
 app.get('/select_project', function(req, res){
 	var user_id = req.param("id");
 	//console.log('user id : ' + user_id);
-
+	
 	fs.readdir("/home/positoy/Documents/bono", function(err, files){
 
 		if (err)
@@ -61,10 +60,6 @@ app.get('/select_project', function(req, res){
 	});
 });
 
-/**********************************************************************
-												POST MESSAGE HANDLERS
-**********************************************************************/
-
 /**********
  LOGIN
  **********/
@@ -74,7 +69,7 @@ app.post('/login', function(req, res){
 
 	var user_id = req.body.id;
 	var user_pwd = req.body.pwd;
-
+	
 	console.log(context, user_id, "login request")
 
 	function login_handler(login_successful, res)
@@ -102,7 +97,7 @@ app.post('/join', function(req, res){
 	var user_id = req.body.id;
 	var user_pwd = req.body.pwd;
 	var user_email = req.body.email;
-
+	
 	console.log(context, user_id, "join request")
 
 	function join_handler(join_successful, res)
@@ -130,7 +125,7 @@ app.post('/project_create', function(req, res){
 	var user_id = req.body.id;
 	var project_name = req.body.pname;
 	var project_desc = req.body.pdesc;
-
+	
 	console.log(context, "project creation request")
 
 	function project_create_handler(project_create_successful, res)
@@ -160,7 +155,7 @@ app.post('/project_invite', function(req, res){
 	var inv_id = req.body.inv_id;
 	var inv_project = req.body.inv_project;
 	var inv_msg = req.body.inv_msg;
-
+	
 	console.log(context, "user invitation request")
 
 	function project_invite_handler(project_invite_successful, res)
@@ -189,12 +184,12 @@ app.post('/project_invite', function(req, res){
 app.post('/file_save', function(req, res){
 	var fileName = req.body.fileName;
 	var contents = req.body.contents;
-
+	
 	fs.writeFile(fileName, contents, 'utf8', function(err){
 		if(err) throw err;
 		console.log("### Save Complete ###");
 	});
-
+	
 	res.sendStatus(200);
 });
 
@@ -206,105 +201,18 @@ app.post('/req_filetree', function(req, res){
 // method - post //openfile : request open file
 app.post('/openFile', function(req, res){
 	var filePath = req.body.path;
-
+	
 	//console.log(filePath);
-
+	
 	if(filePath){
 		fs.readFile(filePath, 'utf-8', function(err, data){
 			//console.log(data);
 			res.send(data);
-		});
+		});	
 	}
 });
 
-/**********************************************************************
-													SOCKTE.IO HANDLERS
-**********************************************************************/
-
-/********************
- PROJECT INVITE LIST
-*********************/
-io.of('/project_invitelist')
-	.on('connection', function(socket){
-
-		var context = "[/project_invitelist] : ";
-		console.log(context, "a user connected (socket.io)")
-
-		// 초대리스트 요청
-		socket.on('invitelist_request',function(user_id){
-
-			// DB에서 사용자 프로젝트 목록 가져오기
-			// project item : {name, desc, member(null), date(null), owner(null)}
-
-			function invitelist_request_handler(arr, socket)
-			{
-				var socket = socket;
-
-				// successful		arr.length != 0
-				// failure			arr.length == 0
-				socket.emit('invitelist_response', JSON.stringify(arr));
-			}
-
-			db.userproject.list(user_id, invitelist_request_handler, socket);
-		});
-
-		// 초대 수락
-		socket.on('invitelist_accept', function(json){
-
-			var obj = JSON.parse(json);
-			var user_id = obj.id;
-			var project_name = obj.project;
-
-			function invitelist_accept_handler(invite_accept_successful, socket)
-			{
-				var socket = socket;
-
-				if (invite_accept_successful)
-				{
-					socket.emit('invitelist_accept_response', 'success');
-				}
-				else
-				{
-					socket.emit('invitelist_accept_response', 'failure');
-				}
-			}
-
-			// execute db
-			db.user.login(o.user, o.password, login_handler, socket);
-		});
-
-		// 초대 거절
-		socket.on('invitelist_decline',function(json){
-
-			var o = JSON.parse(json);
-
-			console.log("[login, " + o.user + "] : login request.");
-
-			// for db
-			// handler
-			function login_handler(login_successful, socket)
-			{
-				var socket = socket;
-
-				if (login_successful) {
-					socket.emit('list_response', 'success');
-				} else {
-					socket.emit('list_response', 'failure');
-				}
-			}
-
-			// execute db
-			db.user.login(o.user, o.password, login_handler, socket);
-		});
-
-
-
-
-
-});
-
-
 // server start listening
-http.listen(8000, function(){
+http.createServer(app).listen(8000, function(){
 	console.log('Server Start');
 });

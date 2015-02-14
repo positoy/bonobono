@@ -31,7 +31,7 @@ module.exports = function() {
         },
 
         userproject: {          //사용자 프로젝트 정보 테이블
-            view: view_,		//참여하고있는 프로젝트 열람
+            list: userproject_list_,		//참여하고있는 프로젝트 열람
             join: join_project_			//초대에 수락하면 프로젝트에 join
         },
 
@@ -41,7 +41,7 @@ module.exports = function() {
 
         invitation: {	                            // 초대 정보 테이블
             invite: invitation_invite_, 		                // 초대정보 추가
-            delete_invitation: delete_invitation_
+            delete: delete_invitation_,
         }
     };
 }
@@ -200,50 +200,59 @@ function invite_notification_ (_id) {
  **********************************/
 function invite_notification_flag_(_id, _change) {
 
-    var query = connection.query("UPDATE userinfo SET invite_notification = '?' WHERE user_id = ? "
-        , [_change,_id], function(err,rows) {
-            if(err) {
-                console.log("invite_notification_flag query error");
-                console.error(err);
-                throw err;
-            } else {
-                console.log(_id + " :userinfo's invite_notification is changed: " + _change);
-            }
+  var context = "[NOTIFLAG, DB] : ";
 
-        });
-}
+  var query = connection.query("UPDATE userinfo SET invite_notification = '?' WHERE user_id = ? ", [_change,_id],
+
+      function(err,rows) {
+
+        console.log(context, query.sql);
+
+        if (err)
+        {
+          console.log(context, "db error");
+          console.error(err);
+          throw err;
+        }
+        else
+        {
+          console.log(context, "flag set to ", _change, "successfully");
+        }
+      });
+    }
 
 /*    userproject    */
 /***********************************************************************
- VIEW
+ LIST
  : 사용자 project 조회 기능
 
  // userproject를 조회해서 사용자가 참여중인 프로젝트를 json array로 보내주기
  ***********************************************************************/
-function view_ (_id, pview_handler, socket) {
+function userproject_list_(user_id, invitelist_request_handler, socket) {
 
-    var projectList = [];
-    var query = connection.query("SELECT * FROM userproject WHERE user_id = ?", _id, function(err,rows) {
+  var context = "[/project_invitelist, DB] : ";
+  var projectList = [];
 
-        if (err) {
-            console.log("[project view] : project list error");
-            console.error(err);
-            pview_handler(false, socket, null);
+  // 참여중인 프로젝트 목록 가져오기
+  var query = connection.query("SELECT * FROM userproject WHERE user_id = ?", _id,
 
-            return;
-        } else {
-            var projectList = [];
+    function(err, rows) {
 
-            for(idx in rows) {
-                projectList.push(rows[idx]['project']);
-            }
+      console.log(context, query.sql);
+      if (err)
+      {
+        console.log(context, "db error");
+        console.log(err);
+        invitelist_request_handler(projectList, socket);
+      }
+      else
+      {
+        for (idx in rows)
+          projectList.push(rows[idx]['project']);
 
-            console.log("[project view] : project list", projectList);
-            pview_handler(true, socket, JSON.stringify(projectList));
-        }
+        invitelist_request_handler(projectList, socket);
+      }
     });
-
-    return projectList;
 }
 
 /*******************************************************************************
@@ -398,7 +407,7 @@ function projectinfo_create_ (user_id, project_name, project_desc, project_creat
                                     {
                                         // 5. projectinfo 에 새로운 프로젝트 추가
                                         var query = connection.query("INSERT INTO projectinfo(project_name, description) VALUES(?, ?)", [project_name, project_desc],
-                                            
+
                                             function(err, result) {
 
                                                 if (err)
@@ -445,27 +454,118 @@ function projectinfo_create_ (user_id, project_name, project_desc, project_creat
  INVITE
  : 타 사용자 초대 기능
 
- // 해당 사용자가 초대하는 프로젝트에 참여중인지 확인
+ // 초대된 사용자가 존재하는 사용자인지 확인
+ // 초대하는 프로젝트가 존재하는 프로젝트인지 확인
+ // 초대된 사용자가 초대하는 프로젝트에 참여중인지 확인
  // 참여중이지 않으면 invitation 테이블에 새 초대 추가
  // invitation 테이블에 새 row를 추가했다면 userproject 테이블에 invite 플래그 1로 토글
  **********************************************************************************/
 //invitation 테이블에 기록 추가
-function invitation_invite_ (_inviting_id, _invited_id, _inv_project, _inv_msg) {
+function invitation_invite_ (user_id, inv_id, inv_project, inv_msg, project_invite_handler, res) {
 
-    var context = "[.project_invite, DB] : ";
+    var context = "[/project_invite, DB] : ";
 
-    var query = connection.query("INSERT INTO invitation(inviting_user, invited_user, inv_project, inv_msg) VALUES (?, ?, ?, ?)"
-        , [_inviting_id, _invited_id, _inv_project, _inv_msg], function(err, rows) {
-            if(err) {
-                console.log("invite query error");
-                console.error(err);
+    // 1. 초대된 사용자가 존재하는 사용자인지 확인
+    var query = connection.query("SELECT * FROM userinfo WHERE user_id=?", inv_id,
+
+        function(err, rows) {
+
+            if (err)
+            {
+                console.log(context, "db error");
+                console.log(err)
                 throw err;
-            } else {
-                invite_notification_flag_(_invited_id, 1);
-                console.log( _inviting_id + " invited " + _invited_id + " in " + _inv_project + " says " + _inv_msg);
             }
-        });
-}
+            else if (rows.length == 0)
+            {
+                // 아이디가 존재하지 않음
+                console.log(context, "id not exist");
+                project_invite_handler(false, res);
+            }
+            else
+            {
+              // 2. 초대하는 프로젝트가 존재하는 프로젝트인지 확인
+              var query = connection.query("SELECT * FROM projectinfo WHERE project_name=?", inv_project,
+
+                function(err, rows) {
+
+                  if (err)
+                  {
+                    console.log(context, "db error2");
+                    console.log(err);
+                    throw err;
+                  }
+                  else if (rows.length == 0)
+                  {
+                    // 프로젝트가 존재하지 않음
+                    console.log(context, "project not exist");
+                    project_invite_handler(false, res);
+                  }
+                  else
+                  {
+                    // 3. 초대된 사용자가 초대하는 프로젝트에 참여중인지 확인
+                    var query = connection.query("SELECT * FROM userproject WHERE user_id=? AND project=?", [inv_id, inv_project],
+
+                      function(err, rows) {
+
+                        if (err)
+                        {
+                          console.log(context, "db error3");
+                          console.log(err);
+                          throw err;
+                        }
+                        else if (rows.length != 0)
+                        {
+                          // 이미 해당 프로젝트에 사용자가 참여 중
+                          console.log(context, "user already joining the project");
+                          project_invite_handler(false, res);
+                        }
+                        else
+                        {
+                          // 4. 참여중이지 않으면 invitation 테이블에 새 초대 추가
+                          var query = connection.query("INSERT INTO invitation(inviting_user, invited_user, inv_project, inv_msg) VALUES (?, ?, ?, ?)", [user_id, inv_id, inv_project, inv_msg],
+
+                            function(err, result) {
+
+                              if (err)
+                              {
+                                console.log(context, "db error4");
+                                console.log(err);
+                                project_invite_handler(false, res);
+                                throw err;
+                              }
+                              else
+                              {
+                                // 5. invitation 테이블에 새 row를 추가했다면 userproject 테이블에 invite 플래그 1로 토글
+                                // result.affectedRows == 1
+                                var query = connection.query("INSERT INTO invitation(inviting_user, invited_user, inv_project, inv_msg) VALUES (?, ?, ?, ?)", [user_id, inv_id, inv_project, inv_msg],
+
+                                  function(err, result) {
+
+                                    console.log(context, query.sql);
+                                    if (err)
+                                    {
+                                      console.log(context, "db error5");
+                                      console.log(err);
+                                      project_invite_handler(false, res);
+                                      throw err;
+                                    }
+                                    else
+                                    {
+                                      invite_notification_flag_(inv_id, 1);
+                                      project_invite_handler(true, res);
+                                      console.log(context, "user invitation successful")
+                                    }
+                                  });
+                              }
+                            });
+                        }
+                      });
+                  }
+                });
+              }
+            });
+          }
 
 /************************************************************
  DELETE_INVITATION
