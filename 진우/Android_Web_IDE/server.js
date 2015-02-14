@@ -40,7 +40,7 @@ app.get('/select_project', function(req, res){
 	var user_id = req.param("id");
 	//console.log('user id : ' + user_id);
 	
-	fs.readdir("C:\Users\Hayeon\Desktop\bonobono\Áø¿ì\Android_Web_IDE\js_client", function(err, files){
+	fs.readdir("/home/choidora/Documents/test_folder/", function(err, files){
 /*
 		for(var i in files){
 			console.log(files[i]);
