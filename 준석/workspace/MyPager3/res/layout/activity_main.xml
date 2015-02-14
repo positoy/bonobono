@@ -1,0 +1,56 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    >
+	    
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="onButton1Clicked"
+	    	android:text="화면 1"  />
+        
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="onButton2Clicked"
+	    	android:text="화면 2"  />
+        
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="onButton3Clicked"
+	    	android:text="화면 3"  />
+        
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="onButton4Clicked"
+	    	android:text="화면 4"  />
+        
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="wrap_content"
+	    	android:layout_height="wrap_content"
+	    	android:onClick="onButton5Clicked"
+	    	android:text="화면 5"  />
+        
+    </LinearLayout>
+    
+    <android.support.v4.view.ViewPager 
+        android:id="@+id/viewPager1"
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+        />
+    
+</LinearLayout>

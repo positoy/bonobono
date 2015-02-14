@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <color name="custom_blue_light">#ff6BA5E7</color> 
+    
+    <!-- <color name="custom_blue_light2">#ff1BA1E2</color> -->
+    <!-- <color name="custom_blue_light3">#ff9BCBD9</color> -->
+    
+    <color name="custom_white">#ffffffff</color> 
+    
+</resources>
