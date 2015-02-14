@@ -1,6 +1,6 @@
 // global variables
 var isShownBtmMenu = false;			// boolean for bottom menu
-var tree_root = "/home/choidora/Documents/test_folder/";
+var tree_root = "C:\Users\Hayeon\Desktop\bonobono\Áø¿ì\Android_Web_IDE\js_client;
 
 $(document).ready(function() {
 	
