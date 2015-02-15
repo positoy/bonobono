@@ -98,6 +98,7 @@ $(document).ready(function() {
 	function make_fileTree(folder_path){
 		$('#left_tree').fileTree({root : folder_path, script : 'req_filetree'}, function(file) {
 		// When file opening...send data to server with 'post'
+		console.log("of1")
 		$.post('openFile', {path : file}, function(data) {
 			make_editor(data, file, 1);
 			});
@@ -137,7 +138,6 @@ $(document).ready(function() {
 		$(e.target).removeClass("file_notSelected");
 		$(e.target).addClass("file_selected");
 
-		console.log("openFile")
 		$.post('openFile', {path : file_path}, function(data){
 			make_editor(data, file_path, 0);
 		});

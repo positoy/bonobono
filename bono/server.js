@@ -269,9 +269,14 @@ app.post('/openFile', function(req, res){
 	var context = "[/openFile] : ";
 
 	var __PROJECT_BASE_DIR = "./user_data/projects/";
-	var filePath = __PROJECT_BASE_DIR + req.body.path;
+	var filePath = req.body.path;
 
-	//console.log(filePath);
+	if (filePath.search(__PROJECT_BASE_DIR) == -1)
+	{
+		filePath = __PROJECT_BASE_DIR + req.body.path;
+	}
+
+	console.log(context, filePath);
 
 	if(filePath){
 		fs.readFile(filePath, 'utf-8', function(err, data){
