@@ -9,126 +9,125 @@
         <script src="//code.jquery.com/jquery-1.10.2.js"></script>
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script>
-            var main = function() {
-              var list_item
-                = $("<li>")
-                .append("<p class='pname'>")
-                .append("<p class='pdesc'>")
-                .append("<p class='pmember'>")
-                .append("<p class='pdate'>")
-                .append("<p class='powner'>");
+          var list_item
+            = $("<li>")
+            .append("<p class='pname'>")
+            .append("<p class='pdesc'>")
+            .append("<p class='pmember'>")
+            .append("<p class='pdate'>")
+            .append("<p class='powner'>");
 
-                var invitelist = io.connect('http://localhost:8000/project_invitelist');
+          var main = function() {
 
-                // 아이디 전송
-                invitelist.on('connect', function(){
-                    console.log('connected');
-                });
-
-                // 프로젝트 정보 받아서 화면 갱신
-                invitelist.on('invitelist_response', function(json){
-
-                  var arr = JSON.parse(json);
-
-                    if (arr.length == 0)
-                    {
-                      alert("프로젝트 정보를 가져오는데 실패했습니다.");
-                    }
-                    else
-                    {
-                      for (var i=0; i<arr.length; i++)
-                      {
-                        console.log(arr[i]);
-                        var li = list_item;
-                        li.children(".pname").html(arr[i].name);
-                        li.children(".pdesc").html(arr[i].desc);
-                        li.children(".pmember").html(arr[i].member);
-                        li.children(".pdate").html(arr[i].date);
-                        li.children(".powner").html(arr[i].owner);
-
-                        $('#project_invitelist_list').append(li);
-                      }
-                    }
-                });
-
-                // 초대리스트 요청
-                $('#btn_request').click(function(){
-
-                  var user_id = $('#user_id');
-
-                  if (user_id != "")
-                  {
-                    invitelist.emit("invitelist_request", user_id);
-                  }
-                });
-
-                // 초대 수락
-                $('#btn_accept').click(function(){
-
-                  var user_id = $('#user_id');
-                  var project_name = $('.selected').children('.pname').html();
-
-                  if (user_id != "" && project_name != "")
-                  {
-                    var json = JSON.stringify({id: user_id, project : project_name});
-                    create.emit('invitelist_accept', json);
-                  }
-
-                });
-
-                // 초대 거절
-                $('#btn_decline').click(function(){
-
-                  var user_id = $('#user_id');
-                  var project_name = $('.selected').children('.pname').html();
-
-                  if (user_id != "" && project_name != "")
-                  {
-                    var json = JSON.stringify({id: user_id, project : project_name});
-                    create.emit('invitelist_decline', json);
-                  }
-
-                });
-
-                // 리스트 선택
-                $('li').click(function(){
-                  $('li').removeClass('selected');
-                  $(this).addClass('selected');
-                });
-            };
-
-            $(document).ready(main);
-        </script>
-
-
-        <script>
-            $(function(){
-                $("#btn_pinvite").click(function(){
-                    var user_id = $("#form_id").val();
-
-                    var inv_id = $("#form_inv_id").val();
-                    var inv_project = $("#form_inv_project").val();
-                    var inv_msg = $("#form_inv_msg").val();
-
-                    if(user_id != "" && inv_id != "" && inv_project != "" && inv_msg != ""){
-                        $.post("/project_invite", {id : user_id, inv_id : inv_id, inv_project : inv_project, inv_msg : inv_msg}, function(data){
-                            if(data == "project_invite_successed"){
-                                alert("project invitation successful")
-                            }
-                            else{
-                                // case1. 존재하지 않는 상대방입니다.
-                                // case2. 존재하지 않는 프로젝트입니다.
-                                // case3. 상대방이 이미 프로젝트에 참여중입니다.
-                                alert("Please Chk Id / Pwd");
-                            }
-                        });
-                    }
-                    else{
-                        alert("Please Chk Id / Pwd");
-                    }
-                });
+            /*****************
+             SOCKET.IO
+            *******************/
+            var invitelist = io.connect('http://localhost:8000/project_invitelist').on('connect', function(){
+              console.log('connected');
             });
-        </script>
+
+            // 프로젝트 정보 받아서 화면 갱신
+            invitelist.on('invitelist_response', function(json){
+
+              // 리스트 비우기
+              $('#project_invitelist_list').empty();
+
+              var arr = JSON.parse(json);
+
+              if (arr.length == 0)
+              {
+                alert("프로젝트 정보를 가져오는데 실패했습니다.");
+              }
+              else
+              {
+                for (var i=0; i<arr.length; i++)
+                {
+                  console.log(arr[i]);
+                  var li = list_item;
+                  li.children(".pname").html(arr[i].name);
+                  li.children(".pdesc").html(arr[i].desc);
+                  li.children(".pmember").html(arr[i].member);
+                  li.children(".pdate").html(arr[i].date);
+                  li.children(".powner").html(arr[i].owner);
+
+                  $('#project_invitelist_list').append(li);
+                }
+              }
+            });
+
+            invitelist.on('invitelist_accept_response', function(json){
+
+              var result = JSON.parse(json);
+
+              if (result.msg == "successful")
+              {
+                alert("프로젝트초대 수락 성공");
+                alert(result.reason)
+              }
+              else
+              {
+                alert("프로젝트초대 수락 실패");
+                alert(result.reason)
+              }
+            });
+
+            invitelist.on('invitelist_decline_response', function(json){
+
+              var result = JSON.parse(json);
+
+              if (result.msg == "successful")
+              {
+                alert("프로젝트초대 거절 성공");
+                alert(result.reason)
+              }
+              else
+              {
+                alert("프로젝트초대 거절 실패");
+                alert(result.reason)
+              }
+            });
+
+          /************************
+           EVENT HANDLERS
+           ************************/
+           // 리스트 선택
+           $('li').click(function(){
+             $('li').removeClass('selected');
+             $(this).addClass('selected');
+           });
+
+           // 초대리스트 요청
+           $('#btn_request').click(function(){
+
+             var user_id = $('#user_id');
+
+             if (user_id != "")
+               invitelist.emit("invitelist_request", user_id);
+           });
+
+           // 초대 수락
+           $('#btn_accept').click(function(){
+
+             var user_id = $('#user_id');
+             var project_name = $('.selected').children('.pname').val();
+
+             if (user_id != "" && project_name != "")
+               create.emit('invitelist_accept', JSON.stringify({id: user_id, project : project_name}));
+           });
+
+           // 초대 거절
+           $('#btn_decline').click(function(){
+
+             var user_id = $('#user_id');
+             var project_name = $('.selected').children('.pname').val();
+
+             if (user_id != "" && project_name != "")
+               create.emit('invitelist_decline', JSON.stringify({id: user_id, project : project_name}));
+           });
+        };
+
+        $(document).ready(main);
+      </script>
     </head>
     <body>
         <div id="project_invitelist_form">

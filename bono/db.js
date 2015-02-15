@@ -41,7 +41,8 @@ module.exports = function() {
 
         invitation: {	                            // 초대 정보 테이블
             invite: invitation_invite_, 		                // 초대정보 추가
-            delete: delete_invitation_,
+            delete: invitation_decline,
+            list : invitation_list,
         }
     };
 }
@@ -178,14 +179,14 @@ function invite_notification_ (_id) {
                     var selected_project = rows[0]['inv_project'];
                     //↑*****선택된 프로젝트로 변수 설정해주는 수정 요함.rows[///이부분 조작해야할듯][]
                     join_(_id, selected_project);
-                    delete_invitation_(_id, selected_project);
+                    invitation_decline(_id, selected_project);
                 }
                 /****************
                  초대 거부
                  ****************/
                 else {
                     var selected_project = rows[0]['inv_project'];
-                    delete_invitation_(_id, selected_project);
+                    invitation_decline(_id, selected_project);
                 }
 
 
@@ -228,9 +229,9 @@ function invite_notification_flag_(_id, _change) {
 
  // userproject를 조회해서 사용자가 참여중인 프로젝트를 json array로 보내주기
  ***********************************************************************/
-function userproject_list_(user_id, invitelist_request_handler, socket) {
+function userproject_list_(user_id, project_list_handler, socket) {
 
-  var context = "[/project_invitelist, DB] : ";
+  var context = "[/project_list, DB] : ";
   var projectList = [];
 
   // 참여중인 프로젝트 목록 가져오기
@@ -243,14 +244,17 @@ function userproject_list_(user_id, invitelist_request_handler, socket) {
       {
         console.log(context, "db error");
         console.log(err);
-        invitelist_request_handler(projectList, socket);
+        project_list_handler(projectList, socket);
       }
       else
       {
         for (idx in rows)
           projectList.push(rows[idx]['project']);
+          // 이렇게 안하고 통째로 json으로 만들어서 전송할 수도 있을 것
+          // 나중에 테스트해보기 JSON.stringify(rows)
 
-        invitelist_request_handler(projectList, socket);
+        project_list_handler(projectList, socket);
+        console.log(context, "project list sent successfully")
       }
     });
 }
@@ -538,28 +542,12 @@ function invitation_invite_ (user_id, inv_id, inv_project, inv_msg, project_invi
                               {
                                 // 5. invitation 테이블에 새 row를 추가했다면 userproject 테이블에 invite 플래그 1로 토글
                                 // result.affectedRows == 1
-                                var query = connection.query("INSERT INTO invitation(inviting_user, invited_user, inv_project, inv_msg) VALUES (?, ?, ?, ?)", [user_id, inv_id, inv_project, inv_msg],
-
-                                  function(err, result) {
-
-                                    console.log(context, query.sql);
-                                    if (err)
-                                    {
-                                      console.log(context, "db error5");
-                                      console.log(err);
-                                      project_invite_handler(false, res);
-                                      throw err;
-                                    }
-                                    else
-                                    {
-                                      invite_notification_flag_(inv_id, 1);
-                                      project_invite_handler(true, res);
-                                      console.log(context, "user invitation successful")
-                                    }
-                                  });
+                                invite_notification_flag_(inv_id, 1);
+                                project_invite_handler(true, res);
+                                console.log(context, "user invitation successful")
                               }
                             });
-                        }
+                          }
                       });
                   }
                 });
@@ -567,15 +555,79 @@ function invitation_invite_ (user_id, inv_id, inv_project, inv_msg, project_invi
             });
           }
 
+
+
 /************************************************************
- DELETE_INVITATION
+ LIST
+ : 초대목록 전송
+
+ // invitation 테이블에 모든 초대 목록 전송
+
+ // 결과전송 [list1, list2, ...]
+ // list : {pname: project_name, pdesc: project_desc, pmember: null, pdate: null, powner: null}
+ ************************************************************/
+function invitation_list(user_id, invitelist_request_handler, socket) {
+
+  var context = "[/project_invitelist, DB] : ";
+  var query = connection.query('SELECT projectinfo.project_name AS "name", projectinfo.description AS "desc" FROM projectinfo LEFT JOIN userproject on projectinfo.project_name = userproject.project WHERE userproject.user_id = ?', user_id,
+
+    function(err,rows) {
+
+      console.log(context, query.sql);
+      if(err)
+      {
+        console.log(context, "db error");
+        console.error(err);
+        invitelist_request_handler([], socket);
+        throw err;
+      }
+      else
+      {
+        console.log(context, "db result", rows);
+        invitelist_request_handler(JSON.stringify(rows), socket);
+        console.log(context, "invite list sent successfully");
+      }
+    });
+}
+
+
+/************************************************************
+ ACCEPT
+ : 초대수락
+
+ // userproject 테이블에 동일한 프로젝트가 존재하지 않으면 project 추가
+ // invitation 테이블에서 project_name 일치하는 모든 아이템 삭제
+ // invitation 테이블에서 더 이상 초대가 없으면 userproject 테이블의 notification 0으로 토글
+
+ // 결과전송 {msg:"successful" or "failure", reason: "reason"}
+ ************************************************************/
+function invitation_accept(_invited_id, _invited_project) {
+
+
+    var query = connection.query("DELETE FROM invitation WHERE invited_user= ? AND inv_project= ?"
+        , [_invited_id, _invited_project], function(err,rows) {
+            if(err) {
+                console.log("delete_invitation query error");
+                console.error(err);
+                throw err;
+            } else {
+                console.log("delete invitation ok");
+            }
+        });
+}
+
+
+/************************************************************
+ DECLINE
  : 초대삭제
 
- // invitation 테이블에서 id, project 일치하는 모든 아이템 삭제
- // invitation 테이블에서 id 일치하는 항목이 더 이상 없으면
+ // invitation 테이블에서 id, project 일치하는 '모든' 아이템 삭제
+ // invitation 테이블에 더 이상 초대가 없으면
  // uerproject 테이블에서 notification 0으로 토글
+
+ // 결과전송 {msg:"successful" or "failure", reason: "reason"}
  ************************************************************/
-function delete_invitation_(_invited_id, _invited_project) {
+function invitation_decline(_invited_id, _invited_project) {
 
 
     var query = connection.query("DELETE FROM invitation WHERE invited_user= ? AND inv_project= ?"

@@ -245,7 +245,7 @@ io.of('/project_invitelist')
 				socket.emit('invitelist_response', JSON.stringify(arr));
 			}
 
-			db.userproject.list(user_id, invitelist_request_handler, socket);
+			db.invitation.list(user_id, invitelist_request_handler, socket);
 		});
 
 		// 초대 수락
