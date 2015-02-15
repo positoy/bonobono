@@ -36,7 +36,8 @@ module.exports = function() {
         },
 
         projectinfo: {                  //프로젝트 정보 테이블
-            create: projectinfo_create_		//프로젝트 생성
+            create: projectinfo_create_,		//프로젝트 생성
+            info: projectinfo_info_
         },
 
         invitation: {	                            // 초대 정보 테이블
@@ -229,13 +230,13 @@ function invite_notification_flag_(_id, _change) {
 
  // userproject를 조회해서 사용자가 참여중인 프로젝트를 json array로 보내주기
  ***********************************************************************/
-function userproject_list_(user_id, project_list_handler, socket) {
+function userproject_list_(user_id, projectlist_request_handler, res) {
 
-  var context = "[/project_list, DB] : ";
+  var context = "[/select_project, DB] : ";
   var projectList = [];
 
   // 참여중인 프로젝트 목록 가져오기
-  var query = connection.query("SELECT * FROM userproject WHERE user_id = ?", _id,
+  var query = connection.query("SELECT * FROM userproject WHERE user_id = ?", user_id,
 
     function(err, rows) {
 
@@ -244,7 +245,7 @@ function userproject_list_(user_id, project_list_handler, socket) {
       {
         console.log(context, "db error");
         console.log(err);
-        project_list_handler(projectList, socket);
+        projectlist_request_handler(false, projectList, res);
       }
       else
       {
@@ -253,8 +254,9 @@ function userproject_list_(user_id, project_list_handler, socket) {
           // 이렇게 안하고 통째로 json으로 만들어서 전송할 수도 있을 것
           // 나중에 테스트해보기 JSON.stringify(rows)
 
-        project_list_handler(projectList, socket);
+        projectlist_request_handler(true, projectList, res);
         console.log(context, "project list sent successfully")
+
       }
     });
 }
@@ -452,6 +454,40 @@ function projectinfo_create_ (user_id, project_name, project_desc, project_creat
             }
         });
 }
+
+/*********************************************************
+ INFO
+ : project 정보 조회 기능
+
+ // projectinfo 테이블에서 프로젝트 정보 얻기
+ // 전송
+ *********************************************************/
+function projectinfo_info_ (project_name, project_info_handler, res) {
+
+  var context = "[/project_info, DB]";
+
+  var query = connection.query('SELECT project_name AS "name", description AS "desc" FROM projectinfo WHERE project_name = ?', project_name,
+
+    function(err, rows) {
+
+      console.log(query.sql);
+      if (err)
+      {
+        console.log(context, "db error");
+        console.error(err);
+        project_info_handler(false, null, res);
+      }
+      else
+      {
+        console.log(rows[0]);
+        project_info_handler(true, rows[0], res);
+        console.log(context, "successful");
+      }
+    });
+}
+
+
+
 
 /*    invitation    */
 /**********************************************************************************

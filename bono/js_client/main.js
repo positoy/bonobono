@@ -1,15 +1,27 @@
 // global variables
 var isShownBtmMenu = false;			// boolean for bottom menu
-var tree_root = "/home/positoy/Documents/bono/";
+// var tree_root = "/home/positoy/Documents/bono/";
+var tree_root = "";
+
+var user_id = "";
+var currentProject = "";
+var fileTreePath = "";
+
+function getParameterByName(name) {
+		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+				results = regex.exec(location.search);
+		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
 
 $(document).ready(function() {
-	
+
 	// Ace Editor Object
 	var editor;
 	var prv_contents;
 	var file_cnt = 0;
-		
-	// flag : is selected fileTree or top bar?	
+
+	// flag : is selected fileTree or top bar?
 	function make_editor(data, file, flag){
 		editor = null;
 		ace.require("ace/ext/language_tools");
@@ -59,11 +71,11 @@ $(document).ready(function() {
 				$(pre_sel).removeClass("file_selected");
 				$(pre_sel).addClass("file_notSelected");
 			}
-			
+
 			var filePathArr = file.split('/');
 			var isOpened = false;
 			var li_index;
-			
+
 			$("#right_topbar_sortable > li").each(function(index){
 				//console.log(filePathArr[filePathArr.length - 1] + "/" + $(this).text().slice(1, $(this).text().length));
 				if(filePathArr[filePathArr.length - 1] == $(this).text().slice(1, $(this).text().length)){
@@ -71,7 +83,7 @@ $(document).ready(function() {
 					li_index = index;
 				}
 			});
-			
+
 			if(!isOpened){
 				$("#right_topbar_sortable").append('<li class="file_selected"><span></span>&nbsp;<a data-path="'+ file +'">'+ filePathArr[filePathArr.length - 1] +'</a></li>');
 				file_cnt++;
@@ -81,7 +93,7 @@ $(document).ready(function() {
 			}
 		}
 	}
-	
+
 	// Using jQuery File Tree - fileTree({root : root dir, script : serverside file}, callback func when chosing file})
 	function make_fileTree(folder_path){
 		$('#left_tree').fileTree({root : folder_path, script : 'req_filetree'}, function(file) {
@@ -101,60 +113,63 @@ $(document).ready(function() {
 			$("#right").css('margin-left', ui.position.left + 12 + "px");
 		}
 	});
-	
+
 	// Sortable settings...
 	$("#right_topbar_sortable").on("click", "span", function(){
 		$(this).parent().remove();
 		if(file_cnt > 0){
 			file_cnt--;
 			prv_contents = "";
-			editor.setValue(prv_contents, 0);	
+			editor.setValue(prv_contents, 0);
 		}
 	});
-	
+
 	$("#right_topbar_sortable").on("click", "li", function(e){
 
 		//var temp = $(e.target).children("a").text();
 		//var fullPath = tree_root.concat(temp);
 		var file_path = $(e.target).children("a").attr("data-path");
-		
+
 		var pre_sel = $("#right_topbar_sortable").children(".file_selected");
 		$(pre_sel).removeClass("file_selected");
 		$(pre_sel).addClass("file_notSelected");
-		
+
 		$(e.target).removeClass("file_notSelected");
 		$(e.target).addClass("file_selected");
-		
+
+		console.log("openFile")
 		$.post('openFile', {path : file_path}, function(data){
 			make_editor(data, file_path, 0);
 		});
 	});
-	
+
 	$("#right_topbar_sortable").sortable({
 		axis : "x"
 	});
 	$("#right_topbar_sortable").disableSelection();
 	$("#li_dummy").remove();
-	
+
 	// Bottom Menu
 	$("#left_bottom_menu").click(function(){
 		if(isShownBtmMenu == false){
 			$("#btm_menu").animate({top : "90%"}, {duration: 1000, easing: 'easeInOutBack'});
 			isShownBtmMenu = true;
 		}
-						
+
 		else{
 			$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
 			isShownBtmMenu = false;
 		}
 	});
-	
+
 	// Bottom Menu - Select Project
 	$("#btm_menu_sel_project").click(function(){
 		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
-			isShownBtmMenu = false;
-		$.get("/select_project?id=cwlsn88", function(data, status){
-			if(data != null){
+		isShownBtmMenu = false;
+
+		$.get("/select_project?id=" + getParameterByName('id'), function(data, status){
+
+			if (data != null){
 				var temp = "<br>";
 				for(var i in data){
 					temp += "<a>" + data[i] + "</a><br><br>";
@@ -182,27 +197,47 @@ $(document).ready(function() {
 			});
 		});
 	});
-	
+
 	$("#dialog_select_project_proj").scroll();
 
+	// project 리스트 항목에서 프로젝트 선택했을 때 오른쪽에 정보 나오기
 	$("#dialog_select_project_proj").on("click", "a", function(){
 		var proj_name = $(this).text();
-		$("#dialog_select_project_info_contents").html("<p>Project Name : " + proj_name + "</p><p>Project Owner : Kimchiman</p><p>Date : 15. 02. 13</p><p>Members : 4</p>");
+
 		$("#dialog_selected_project").val(proj_name);
+
+
+		// 서버에서 프로젝트 정보 받기
+		$.get("/project_info?project=" + proj_name, function(data, status){
+
+			// 과연 get 메세지는 객체를 수신할 수 있을 것인가?!
+			console.log(data);
+			if (data != null){
+				// 프로젝트 정보 붙여주기
+				$("#dialog_select_project_info_contents").html("<p>Project Name : " + data.name + "</p><p>Description : " + data.desc + "</p><p>Project Owner : " + data.owner + "</p><p>Date : " + data.date + "</p><p>Members : " + data.member + "</p>");
+			}
+		});
 	});
 
+	// 프로젝트 불러오기
 	$("#dialog_select_project_select").click(function() {
 		var target = $("#dialog_selected_project").val();
+
 		if (target) {
-			make_fileTree(tree_root.concat(target) + "/");
+			currentProject = target;
+			user_id = getParameterByName('id');
+			fileTreePath = currentProject + "/_" + user_id + "/";
+			console.log(fileTreePath);
+
+			make_fileTree(fileTreePath);
 			$("#dialog_select_project").dialog("close");
 		} else {
 			alert("Please Select a Project to open..");
 		}
-	}); 
-	
+	});
+
 	// Context Menu
-	$(function(){ 
+	$(function(){
 		$.contextMenu({
 			selector: "#left_tree",
 			items: {
@@ -218,4 +253,5 @@ $(document).ready(function() {
 	        }
 		});
 	});
-}); 
+
+});

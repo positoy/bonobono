@@ -25,6 +25,10 @@ app.use(express.Router());
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+/**********************************************************************
+												GET MESSAGE HANDLERS
+**********************************************************************/
+
 // method - get /
 app.get('/', function(req, res){
 	fs.readFile('login.html', function(err, data){
@@ -43,22 +47,56 @@ app.get('/main', function(req, res){
 
 // method - get /select_project
 app.get('/select_project', function(req, res){
+
+	var context = "[/select_project] : ";
 	var user_id = req.param("id");
-	//console.log('user id : ' + user_id);
 
-	fs.readdir("/home/positoy/Documents/bono", function(err, files){
+	console.log(context, user_id, "project list request");
 
-		if (err)
+	function projectlist_request_handler(projectlist_request_successful, projectList, res)
+	{
+		var res = res;
+
+		if (projectlist_request_successful)
 		{
-			console.log("error occured.");
+			res.send(projectList);
 		}
-/*
-		for(var i in files){
-			console.log(files[i]);
+		else
+		{
+			res.send(null);
+			console.log(context, "failure");
 		}
-*/
-		res.send(files);
-	});
+	}
+
+	db.userproject.list(user_id, projectlist_request_handler, res);
+
+});
+
+// method - get /select_project
+app.get('/project_info', function(req, res){
+
+	var context = "[/project_info] : ";
+	var project_name = req.param("project");
+
+	console.log(context, "project information request");
+
+	function project_info_handler(project_info_successful, projectObj, res)
+	{
+		var res = res;
+
+		if (project_info_successful)
+		{
+			res.send(projectObj);
+		}
+		else
+		{
+			res.send(null);
+			console.log(context, "failure");
+		}
+	}
+
+	db.projectinfo.info(project_name, project_info_handler, res);
+
 });
 
 /**********************************************************************
@@ -185,6 +223,9 @@ app.post('/project_invite', function(req, res){
 // app.post('/project_participate')
 // app.post('/project_invite')
 
+/*********************
+ EDITOR - FILE SAVE
+**********************/
 // method = post /file_save : save file when client press 'Ctrl + S'
 app.post('/file_save', function(req, res){
 	var fileName = req.body.fileName;
@@ -198,14 +239,37 @@ app.post('/file_save', function(req, res){
 	res.sendStatus(200);
 });
 
+/*********************
+ EDITOR - FILE TREE
+**********************/
 // method - post /req_filetree : request file tree
 app.post('/req_filetree', function(req, res){
+
+	var context = "[/req_filetree] : ";
+
+	var __PROJECT_BASE_DIR = "./user_data/projects/";
+	var dir = req.body.dir
+
+	if (dir.search(__PROJECT_BASE_DIR) != -1)
+	{
+		req.body.dir = dir.substr(__PROJECT_BASE_DIR.length);
+	}
+
+	console.log(context, req.body.dir)
+
 	filetree.getDirList(req, res);
 });
 
+/*********************
+ EDITOR - OPEN FILE
+**********************/
 // method - post //openfile : request open file
 app.post('/openFile', function(req, res){
-	var filePath = req.body.path;
+
+	var context = "[/openFile] : ";
+
+	var __PROJECT_BASE_DIR = "./user_data/projects/";
+	var filePath = __PROJECT_BASE_DIR + req.body.path;
 
 	//console.log(filePath);
 
@@ -228,7 +292,7 @@ io.of('/project_invitelist')
 	.on('connection', function(socket){
 
 		var context = "[/project_invitelist] : ";
-		console.log(context, "a user connected (socket.io)")
+		console.log(context, "a user connected (socket.io)");
 
 		// 초대리스트 요청
 		socket.on('invitelist_request',function(user_id){
@@ -296,11 +360,6 @@ io.of('/project_invitelist')
 			// execute db
 			db.user.login(o.user, o.password, login_handler, socket);
 		});
-
-
-
-
-
 });
 
 
