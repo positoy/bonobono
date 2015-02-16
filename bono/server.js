@@ -111,57 +111,75 @@ app.get('/btm_menu_export', function(request, response){
 	var project_name = request.param("project");
 	// android create project -n project_name -p path -t target
 	// ./user_data/projects/project_name/user_id/Myd
+	var __BASE_DIR = "./user_data/projects/";
 	var path = "./user_data/projects/"+project_name+"/_"+user_id;
 
-	
 
-	var child_first = exec("android update project -p "+ path + " -n "+project_name, function(err, stdout, stderr){
-		sys.print('stdout : '+ stdout);
-		sys.print('stderr : '+ stderr);
-	//	response.send(stdout);
-		if(err !== null){
-			console.log('err : ' +err);
-		}
-		else{
-			console.log(a_u_p+" success!");
-		}
-		var child_second = exec("cp -r /home/js/Desktop/workspace/appcompat_v7 "+path+"/../;cp /home/js/Desktop/workspace/appcompat_v7/libs/android-support-v4.jar "+path+"/libs/android-support-v4.jar ",function(err,stdout,stderr){
+
+	var child_first = exec("android update project -p "+ path + " -n "+project_name + " -t 34",
+
+		function(err, stdout, stderr){
 			sys.print('stdout : '+ stdout);
 			sys.print('stderr : '+ stderr);
-			response.send(stdout);
-			if(err !== null){
+		//	response.send(stdout);
+			if (err !== null)
+			{
 				console.log('err : ' +err);
 			}
-			else{
-				console.log(cp+" success!");
+			else
+			{
+				console.log(a_u_p+" success!");
+				var child_second = exec("cp -r " + __BASE_DIR + "appcompat_v7 " + __BASE_DIR + project_name,
+
+					function(err,stdout,stderr) {
+
+						sys.print('stdout : '+ stdout);
+						sys.print('stderr : '+ stderr);
+						if (err !== null)
+						{
+							console.log('err : ' +err);
+						}
+						else
+						{
+							console.log(cp+" success!");
+							var child_third = exec("cp -r " + __BASE_DIR + "/appcompat_v7/libs/android-support-v4.jar " + __BASE_DIR + project_name + "/_" + user_id + "/libs/android-support-v4.jar",
+
+								function(err,stdout,stderr) {
+									sys.print('stdout : '+ stdout);
+									sys.print('stderr : '+ stderr);
+									response.send(stdout);
+
+									if (err !== null)
+									{
+										console.log('err : ' +err);
+									}
+									else
+									{
+										console.log(cp+" success!");
+									}
+							});
+						}
+				});
 			}
 		});
-/*
-		var child_third = exec("cp /home/js/Desktop/workspace/test.keystore "+path+"/test.keystore ",function(err,stdout,stderr){
-			sys.print('stdout : '+ stdout);
-			sys.print('stderr : '+ stderr);
-			response.send(stdout);
-			if(err !== null){
-				console.log('err : ' +err);
-						else{
-				console.log(cp+" success!");
-			}
-		});*/
-	});
-	
 });
+
 app.get('/btm_menu_import', function(request, response){
 
 	console.log("keystore!");
 	var user_id = request.param("id");
 	var project_name = request.param("project");
-	var path = "./user_data/projects/"+project_name+"/_"+user_id;
 
-	var child_key = exec("cp /home/js/Desktop/workspace/test.keystore "+path+"/test.keystore; cp /home/js/Desktop/workspace/local.properties "+path+"/local.properties ",function(err,stdout,stderr){
+	var __BASE_DIR = "./user_data/projects/";
+	var path = __BASE_DIR + project_name+"/_"+user_id;
+
+
+	var child_key = exec("cp " + path + "/../../test.keystore " + path + "/test.keystore; cp " + path + "/../../local.properties "+path+"/local.properties ",function(err,stdout,stderr){
 			sys.print('stdout : '+ stdout);
 			sys.print('stderr : '+ stderr);
 			response.send(stdout);
-			if(err !== null){
+			if(err !== null)
+			{
 				console.log('err : ' +err);
 			}
 			//else{
@@ -169,6 +187,7 @@ app.get('/btm_menu_import', function(request, response){
 			//}
 		});
 });
+
 //child : run
 app.get('/btm_menu_run', function(request, response){
 	console.log("run start!");
