@@ -116,7 +116,7 @@ app.get('/btm_menu_export', function(request, response){
 
 
 
-	var child_first = exec("android update project -p "+ path + " -n "+project_name + " -t 34",
+	var child_first = exec("android update project -p "+ path + " -n "+project_name + " -t 35",
 
 		function(err, stdout, stderr){
 			sys.print('stdout : '+ stdout);

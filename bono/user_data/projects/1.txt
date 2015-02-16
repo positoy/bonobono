@@ -1,0 +1,1 @@
+﻿keytool -genkey -alias test -keyalg RSA -keystore test.keystore -validity 10000
