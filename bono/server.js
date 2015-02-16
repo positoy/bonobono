@@ -15,6 +15,9 @@ var bodyParser = require('body-parser');
 var filetree = require('./lib/jqueryFileTree_srv.js');
 
 // make server
+var sys = require('sys');
+var exec  = require('child_process').exec;
+
 var app = express();
 
 // middleware installation
@@ -99,6 +102,89 @@ app.get('/project_info', function(req, res){
 
 });
 
+app.get('/btm_menu_export', function(request, response){
+	console.log("build.xml create and update");
+	var a_u_p="android update project ";
+	var cp = "android-support-v4";
+
+	var user_id = request.param("id");
+	var project_name = request.param("project");
+	// android create project -n project_name -p path -t target
+	// ./user_data/projects/project_name/user_id/Myd
+	var path = "./user_data/projects/"+project_name+"/_"+user_id;
+
+	
+
+	var child_first = exec("android update project -p "+ path + " -n "+project_name, function(err, stdout, stderr){
+		sys.print('stdout : '+ stdout);
+		sys.print('stderr : '+ stderr);
+	//	response.send(stdout);
+		if(err !== null){
+			console.log('err : ' +err);
+		}
+		else{
+			console.log(a_u_p+" success!");
+		}
+		var child_second = exec("cp -r /home/js/Desktop/workspace/appcompat_v7 "+path+"/../;cp /home/js/Desktop/workspace/appcompat_v7/libs/android-support-v4.jar "+path+"/libs/android-support-v4.jar ",function(err,stdout,stderr){
+			sys.print('stdout : '+ stdout);
+			sys.print('stderr : '+ stderr);
+			response.send(stdout);
+			if(err !== null){
+				console.log('err : ' +err);
+			}
+			else{
+				console.log(cp+" success!");
+			}
+		});
+/*
+		var child_third = exec("cp /home/js/Desktop/workspace/test.keystore "+path+"/test.keystore ",function(err,stdout,stderr){
+			sys.print('stdout : '+ stdout);
+			sys.print('stderr : '+ stderr);
+			response.send(stdout);
+			if(err !== null){
+				console.log('err : ' +err);
+						else{
+				console.log(cp+" success!");
+			}
+		});*/
+	});
+	
+});
+app.get('/btm_menu_import', function(request, response){
+
+	console.log("keystore!");
+	var user_id = request.param("id");
+	var project_name = request.param("project");
+	var path = "./user_data/projects/"+project_name+"/_"+user_id;
+
+	var child_key = exec("cp /home/js/Desktop/workspace/test.keystore "+path+"/test.keystore; cp /home/js/Desktop/workspace/local.properties "+path+"/local.properties ",function(err,stdout,stderr){
+			sys.print('stdout : '+ stdout);
+			sys.print('stderr : '+ stderr);
+			response.send(stdout);
+			if(err !== null){
+				console.log('err : ' +err);
+			}
+			//else{
+			//	console.log(cp+" success!");
+			//}
+		});
+});
+//child : run
+app.get('/btm_menu_run', function(request, response){
+	console.log("run start!");
+	var user_id = request.param("id");
+	var project_name = request.param("project");
+	var path = "./user_data/projects/"+project_name+"/_"+user_id;
+
+	var child = exec("cd "+path+"; ant clean release",function(err,stdout,stderr){
+			sys.print('stdout : '+ stdout);
+			sys.print('stderr : '+ stderr);
+			response.send(stdout);
+			if(err !== null){
+				console.log('err : ' +err);
+			}
+	});
+});
 /**********************************************************************
 												POST MESSAGE HANDLERS
 **********************************************************************/
@@ -285,6 +371,7 @@ app.post('/openFile', function(req, res){
 		});
 	}
 });
+
 
 /**********************************************************************
 													SOCKTE.IO HANDLERS
