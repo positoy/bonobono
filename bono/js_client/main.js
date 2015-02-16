@@ -254,4 +254,36 @@ $(document).ready(function() {
 		});
 	});
 
+	$("#btm_menu_export").click(function(){
+		var user_id=getParameterByName("id");
+		var project_name=currentProject;
+
+		var path = "/btm_menu_export?id="+user_id+"&project="+project_name;
+		console.log(path)
+		$.get("/btm_menu_export?id="+user_id+"&project="+project_name, function(data,status){
+
+			alert(data);
+		});
+	});
+	$("#btm_menu_import").click(function(){
+		var user_id=getParameterByName("id");
+		var project_name=currentProject;
+
+		var path = "/btm_menu_import?id="+user_id+"&project="+project_name;
+		console.log(path)
+		$.get("/btm_menu_import?id="+user_id+"&project="+project_name, function(data,status){
+
+			alert(data);
+		});
+	});
+	$("#btm_menu_run").click(function(){
+		var user_id=getParameterByName("id");
+		var project_name=currentProject;
+
+		var path = "/btm_menu_run?id="+user_id+"&project="+project_name;
+$.get("/btm_menu_run?id="+user_id+"&project="+project_name, function(data,status){
+
+			alert(data);
+		});
+	});
 });
