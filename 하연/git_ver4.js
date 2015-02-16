@@ -3,7 +3,13 @@ var fs = require('fs');
 var sys = require('sys');
 var exec = require('child_process').exec;
 
+var __DIR = './user_data/projects/';
+
 exports.create_new_bare = function(project_name, user_name, handler) {
+
+	var DIR_PROJECT = __DIR + project_name;
+	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
 
 	var goal = "\n[git] create bare repository";
 	console.log(goal);
@@ -19,7 +25,8 @@ exports.create_new_bare = function(project_name, user_name, handler) {
 	// "git --bare init origin" : create origin and bare init(bare repository).
 	var task1 = function(callback) 
 	{
-		var cmd = "cd projects & cd " + project_name + "&" + "git --bare init origin";
+		//var cmd = "cd projects & cd " + project_name + "&" + "git --bare init origin";
+		var cmd = "cd " + DIR_PROJECT +" & " + "git --bare init origin";
 		var child = exec(cmd, function(error, stdout, stderr) {
 			if (error !== null)
 			{
@@ -38,7 +45,9 @@ exports.create_new_bare = function(project_name, user_name, handler) {
 	// "git clone origin user_name" : create origin and bare init(bare repository).
 	var task2 = function(callback) 
 	{
-		var cmd = "cd projects & cd " + project_name + "&" + "git clone origin _" + user_name;
+		//var cmd = "cd projects & cd " + project_name + "&" + "git clone origin _" + user_name;
+		var cmd = "cd " + DIR_PROJECT + " & " + "git clone origin _" + user_name;
+		
 		var child = exec(cmd, function(error, stdout, stderr) {
 			if (error !== null)
 			{
@@ -64,6 +73,10 @@ exports.create_new_bare = function(project_name, user_name, handler) {
 
 exports.our_join = function(project_name, user_name, handler) {
 
+	var DIR_PROJECT = __DIR + project_name;
+	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
+
 	var goal = "\n[git] join to the bare repository";
 	console.log(goal);
 
@@ -78,7 +91,9 @@ exports.our_join = function(project_name, user_name, handler) {
 	// "git clone origin user_name" : create origin and bare init(bare repository).
 	var task1 = function(callback) 
 	{
-		var cmd = "cd projects & cd " + project_name + "&" + "git clone origin _" + user_name;
+		//var cmd = "cd projects & cd " + project_name + "&" + "git clone origin _" + user_name;
+		var cmd = "cd " + DIR_PROJECT + " & " + "git clone origin _" + user_name;
+		
 		var child = exec(cmd, function(error, stdout, stderr) {
 			if (error !== null)
 			{
@@ -103,6 +118,10 @@ exports.our_join = function(project_name, user_name, handler) {
 
 exports.our_commit = function(project_name, user_name, commit_message, handler) {
 
+	var DIR_PROJECT = __DIR + project_name;
+	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
+
 	console.log("our_commit 성공!");
 	//var goal = "\n[git] commit project '" + project_name + "'";
 	//console.log(goal);
@@ -110,8 +129,10 @@ exports.our_commit = function(project_name, user_name, commit_message, handler) 
 	// "git add --all" : staging
 	var task0 = function(callback)
 	{
-		var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git add --all";	//window (-a도 됨)
-		//var cmd = "cd projects ; cd " + project_name + ";" + "cd " + user_name + ";" + "pushd;" + "git add --a"	//linux
+		//var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git add --all";	//window (-a도 됨)
+		//var cmd = "cd projects ; cd " + project_name + ";" + "cd _" + user_name + ";" + "pushd;" + "git add --a"	//linux
+		var cmd = "cd " + DIR_PROJECT_USER + " & " + "git add --all";	//window (-a도 됨)
+
 		var child = exec(cmd, function(error, stdout, stderr) {
 			if(error !== null) 
 			{
@@ -129,8 +150,10 @@ exports.our_commit = function(project_name, user_name, commit_message, handler) 
 	// "git commit -m 'commit message'" : commit with message.
 	var task1 = function(callback)
 	{
-		var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git commit -m \"" + commit_message + "\"";	//window
+		//var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git commit -m \"" + commit_message + "\"";	//window
 		//var cmd = "popd;" + "git commit -m \"" + commit_message + "\"";	//linux
+		var cmd = "cd " + DIR_PROJECT_USER + " & " + "git commit -m \"" + commit_message + "\"";	//window
+		
 		var child = exec(cmd, function(error, stdout, stderr) {
 			if (error !== null)
 			{
@@ -155,13 +178,18 @@ exports.our_commit = function(project_name, user_name, commit_message, handler) 
 
 exports.our_push = function(project_name, user_name, handler) {
 
+	var DIR_PROJECT = __DIR + project_name;
+	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
+
 	var goal = "\n[git] push project '" + project_name + "'";
 	console.log(goal);
 	
 	// "git push origin master" : push project's master branch to the origin(remote repository).
 	var task0 = function(callback) 
 	{
-		var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git push origin master";
+		//var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git push origin master";
+		var cmd = "cd " + DIR_PROJECT_USER + " & " + "git push origin master";
 		var child = exec(cmd, function(error, stdout, stderr) {
 			if (error !== null)
 			{
@@ -193,12 +221,17 @@ exports.our_push = function(project_name, user_name, handler) {
 
 exports.our_pull = function(project_name, user_name, handler) {
 
+	var DIR_PROJECT = __DIR + project_name;
+	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
+
 	var goal = "\n[git] pull project '" + project_name + "'";
 	console.log(goal);
 
 	var task0 = function(callback) 
 	{
-		var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git pull origin master";
+		//var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git pull origin master";
+		var cmd "cd " + DIR_PROJECT_USER + " & " + "git pull origin master";
 		var chile = exec(cmd, function(error,stdout, stderr) {
 			if (error !== null)
 			{
