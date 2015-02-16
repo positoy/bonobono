@@ -196,7 +196,8 @@ exports.our_pull = function(project_name, user_name, handler) {
 	var goal = "\n[git] pull project '" + project_name + "'";
 	console.log(goal);
 
-	var task0 = function(callback) {
+	var task0 = function(callback) 
+	{
 		var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git pull origin master";
 		var chile = exec(cmd, function(error,stdout, stderr) {
 			if (error !== null)
