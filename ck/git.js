@@ -4,7 +4,6 @@ var sys = require('sys');
 var exec = require('child_process').exec;
 
 var __DIR = './user_data/projects/';
-var __child = null;
 
 // child
 // login, view, create, join, invite
