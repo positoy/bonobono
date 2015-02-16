@@ -1,0 +1,26 @@
+1. 'js_client' > 'main.js' 에 global variables 에 var tree_root 변경
+
+2. 'server.js' 에 // method - get /select_project 주석 된 메소드 찾아서(38~50줄)
+    fs.readdir("")안에 경로 tree_root랑 똑같이 바꿔주기
+
+3. Android_Web_IDE 폴더 경로에서 node server.js 누르면 서버 작동
+
+4. id & pwd : cwlsn88 치고 Login 누르면 들어가짐
+
+
+
+
+귀찮아서 아직 손안봐서 이렇게 해야 동작하니 참고하세요.
+
+1) 좌측 하단 하늘색 버튼 누르면 메뉴 튀나옴
+2) 맨 왼쪽 안드로이드 버튼이 "Select Project" 버튼임
+3) 누르면 tree_root에 설정해놓은 폴더에 있는 모든 프로젝트 보임
+4) 프로젝트 선택하면 오른쪽에 info 뜨는데 지금은 뻥임
+5) Select 버튼 누르면 에디터 나옴
+
+
+
+
+
+
+문의사항 : 010-8220-1297

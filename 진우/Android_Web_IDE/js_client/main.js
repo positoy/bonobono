@@ -1,5 +1,6 @@
 // global variables
 var isShownBtmMenu = false;			// boolean for bottom menu
+<<<<<<< HEAD
 // ******************************************
 var isPerInfoVisible = false;		// boolean for personal_info menu
 // ******************************************
@@ -21,6 +22,10 @@ function getParameterByName(name) {
 
 
 
+=======
+var tree_root = "/home/choidora/Documents/test_folder/";
+
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 $(document).ready(function() {
 	
 	// Ace Editor Object
@@ -104,10 +109,17 @@ $(document).ready(function() {
 	// Using jQuery File Tree - fileTree({root : root dir, script : serverside file}, callback func when chosing file})
 	function make_fileTree(folder_path){
 		$('#left_tree').fileTree({root : folder_path, script : 'req_filetree'}, function(file) {
+<<<<<<< HEAD
 			// When file opening...send data to server with 'post'
 			$.post('openFile', {path : file}, function(data) {
 					make_editor(data, file, 1);
 				});
+=======
+		// When file opening...send data to server with 'post'
+		$.post('openFile', {path : file}, function(data) {
+			make_editor(data, file, 1);
+			});
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 		});
 	}
 
@@ -172,7 +184,11 @@ $(document).ready(function() {
 	$("#btm_menu_sel_project").click(function(){
 		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
 			isShownBtmMenu = false;
+<<<<<<< HEAD
 		$.get("/select_project?id=" + getParameterByName('id'), function(data, status){
+=======
+		$.get("/select_project?id=cwlsn88", function(data, status){
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 			if(data != null){
 				var temp = "<br>";
 				for(var i in data){
@@ -206,6 +222,7 @@ $(document).ready(function() {
 
 	$("#dialog_select_project_proj").on("click", "a", function(){
 		var proj_name = $(this).text();
+<<<<<<< HEAD
 		
 		$("#dialog_selected_project").val(proj_name);
 
@@ -232,12 +249,26 @@ $(document).ready(function() {
 			console.log(fileTreePath);
 
 			make_fileTree(fileTreePath);
+=======
+		$("#dialog_select_project_info_contents").html("<p>Project Name : " + proj_name + "</p><p>Project Owner : Kimchiman</p><p>Date : 15. 02. 13</p><p>Members : 4</p>");
+		$("#dialog_selected_project").val(proj_name);
+	});
+
+	$("#dialog_select_project_select").click(function() {
+		var target = $("#dialog_selected_project").val();
+		if (target) {
+			make_fileTree(tree_root.concat(target) + "/");
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 			$("#dialog_select_project").dialog("close");
 		} else {
 			alert("Please Select a Project to open..");
 		}
+<<<<<<< HEAD
 	});
 
+=======
+	}); 
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 	
 	// Context Menu
 	$(function(){ 
@@ -256,6 +287,7 @@ $(document).ready(function() {
 	        }
 		});
 	});
+<<<<<<< HEAD
 	
 	// ************************************************
 	
@@ -417,4 +449,6 @@ $(document).ready(function() {
 			}
 		}); 
 
+=======
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 }); 

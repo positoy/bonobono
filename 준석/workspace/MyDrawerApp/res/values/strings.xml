@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">바로가기메뉴예제</string>
+    <string name="title_section1">첫번째 화면</string>
+    <string name="title_section2">두번째 화면</string>
+    <string name="title_section3">세번째 화면</string>
+    <string name="navigation_drawer_open">바로가기 메뉴 열기</string>
+    <string name="navigation_drawer_close">바로가기 메뉴 닫기</string>
+    
+    <string name="action_example">Example action</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

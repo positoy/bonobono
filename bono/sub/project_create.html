@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+        <script>
+            $(function(){
+                $("#btn_pcreate").click(function(){
+                    var user_id = $("#form_id").val();
+                    var project_name = $("#form_pname").val();
+                    var project_desc = $("#form_pdesc").val();;
+                    if(user_id != "" && project_name != "" && project_desc != ""){
+                        $.post("/project_create", {id : user_id, pname : project_name, pdesc : project_desc}, function(data){
+                            if(data == "project_create_successed"){
+                                alert("project creation successful")
+                            }
+                            else{
+                                // case1. 이미 존재하는 프로젝트입니다.
+                                alert("Please Chk Id / Pwd");
+                            }
+                        });
+                    }
+                    else{
+                        alert("Please Chk Id / Pwd");
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="project_create_form">
+            <div class="project_create_forms">
+                <input type="text" placeholder="User ID" name="user_id" id="form_id"/>
+            </div>
+            <div class="project_create_forms">
+                <input type="text" placeholder="Project Name" name="project_name" id="form_pname"/>
+            </div>
+            <div class="project_create_forms">
+                <input type="text" placeholder="Project Description" name="project_desc" id="form_pdesc"/>
+            </div>
+            <div class="project_create_forms">
+                <input type="button" value="Create Project" id="btn_pcreate"/>
+            </div>
+        </div>
+    </body>
+</html>

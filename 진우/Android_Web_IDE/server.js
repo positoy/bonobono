@@ -36,6 +36,7 @@ app.get('/', function(req, res){
 	});
 });
 
+<<<<<<< HEAD
 
 // method - get /signUp : Sign Up for new User
 app.get('/signUp', function(req, res){
@@ -45,6 +46,8 @@ app.get('/signUp', function(req, res){
 });
 
 
+=======
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 // method - get /main
 app.get('/main', function(req, res){
 	var user_id = req.param("id");
@@ -54,6 +57,7 @@ app.get('/main', function(req, res){
 	});
 });
 
+<<<<<<< HEAD
 
 
 // method - get /select_project
@@ -192,6 +196,54 @@ app.post('/project_create', function(req, res){
 	}
 
 	db.projectinfo.create(user_id, project_name, project_desc, project_create_handler, res);
+=======
+// method - get /select_project
+app.get('/select_project', function(req, res){
+	var user_id = req.param("id");
+	//console.log('user id : ' + user_id);
+	
+	fs.readdir("/home/choidora/Documents/test_folder/", function(err, files){
+/*
+		for(var i in files){
+			console.log(files[i]);
+		}
+*/
+		res.send(files);
+	});
+});
+
+// method - get /login
+app.post('/login', function(req, res){
+	var user_id = req.body.id;
+	var user_pwd = req.body.pwd;
+	
+	if(user_id == "cwlsn88" && user_pwd == "cwlsn88"){
+		//console.log("login complete");
+		res.send("login_successed");
+	}
+	else{
+		//console.log("login failed");
+		res.send("login_failed");
+	}
+});
+
+// method = post /file_save : save file when client press 'Ctrl + S'
+app.post('/file_save', function(req, res){
+	var fileName = req.body.fileName;
+	var contents = req.body.contents;
+	
+	fs.writeFile(fileName, contents, 'utf8', function(err){
+		if(err) throw err;
+		console.log("### Save Complete ###");
+	});
+	
+	res.sendStatus(200);
+});
+
+// method - post /req_filetree : request file tree
+app.post('/req_filetree', function(req, res){
+	filetree.getDirList(req, res);
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 });
 
 /***************
@@ -279,6 +331,7 @@ app.post('/openFile', function(req, res){
 
 	var __PROJECT_BASE_DIR = "./user_data/projects/";
 	var filePath = req.body.path;
+<<<<<<< HEAD
 
 	if (filePath.search(__PROJECT_BASE_DIR) == -1)
 	{
@@ -287,10 +340,16 @@ app.post('/openFile', function(req, res){
 
 	console.log(context, filePath);
 
+=======
+	
+	//console.log(filePath);
+	
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 	if(filePath){
 		fs.readFile(filePath, 'utf-8', function(err, data){
 			//console.log(data);
 			res.send(data);
+<<<<<<< HEAD
 		});
 	}
 });
@@ -375,6 +434,10 @@ io.of('/project_invitelist')
 			// execute db
 			db.user.login(o.user, o.password, login_handler, socket);
 		});
+=======
+		});	
+	}
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 });
 
 

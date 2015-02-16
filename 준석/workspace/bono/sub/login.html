@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./css/bono.css" />
+        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+        <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script>
+            var username, password;
+
+            var main = function() {
+                var create = io.connect('http://127.0.0.1:3000/login');
+
+                // 아이디 전송
+                create.on('connect', function(){
+                    console.log('connected');
+                });
+
+                // 프로젝트 정보 받아서 화면 갱신
+                create.on('login_response', function(msg){
+                    
+                    if (msg == 'failure')
+                    {
+                        console.log("recv", "login_response", "failure");
+                    }
+                    else if (msg == 'success')
+                    {
+                        console.log("recv", "login_response", "success");
+                        parent.location = "p_view.html"
+                    }
+                });
+
+                $('#btn-login').click(function(){
+                    
+                    username = $('#username').val();
+                    password = $('#password').val();
+                    
+                    if (username.trim() == "" || password.trim() == "")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        var o = { user: username, password: password };
+                        var json = JSON.stringify(o);
+                        create.emit('login_request', json);
+                        console.log("send", "login_request");
+                    }
+                });
+            };
+
+            $(document).ready(main);
+        </script>
+    </head>
+    <script>
+    
+    </script>
+    <body>
+        <div id="login">
+            <div class="container">
+                <ul>
+                    <li><p>username</p>
+                    <input id="username" type="text" /></li>
+                    <li><p>password</p>
+                    <input id="password" type="password" /></li>
+                    <li><button id="btn-login">login</button></li>
+                    <li><button id="btn-join" onclick="parent.location='join.html'">join</button></li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

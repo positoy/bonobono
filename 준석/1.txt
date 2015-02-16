@@ -1,7 +1,7 @@
 ﻿해야할 것들!
 
 지금까지 한거 정리.프로젝트생성, 기존 프로젝트 apk 파일 추출(리눅스로는 테스트 중 90퍼센트 해결)
-
+/////////////////////////////////////////////2/7
 이제 1.class 파일 추가 (1,2번세트)	
      2.기본 library 추가 제거		
      //기존프로젝트 apk 성공 목록
@@ -25,3 +25,81 @@
      ant 버전별 apk 파일 추출
      3rd party library 관련
      apk 파일 자동 설치
+//////////////////////////////////////////////////2/14
+사용법
+1.workspace 폴더를 desktop 위치에 둔다
+2.workspace/bono/js_client/main.js  에 있는 내용을 첨부한다.
+  
+  $("#btm_menu_export").click(function(){
+    $.get("/btm_menu_export", function(data,status){
+
+      alert(data);
+    });
+  });
+  $("#btm_menu_run").click(function(){
+    $.get("/btm_menu_run", function(data,status){
+
+      alert(data);
+    });
+  });
+
+3.workspace/bono/server.js  에 있는 내용을 첨부한다.
+   first!  declare 
+            var sys = require('sys');
+            var exec  = require('child_process').exec;
+   second! add
+
+            app.get('/btm_menu_export', function(request,response){
+  var a_u_p="android update project ";
+  var cp = "android-support-v4";
+
+  var child_first = exec("android update project -p /home/js/Desktop/workspace/MyDrawerApp -n MyDrawerApp", function(err, stdout, stderr){
+    sys.print('stdout : '+ stdout);
+    sys.print('stderr : '+ stderr);
+  //  response.send(stdout);
+    if(err !== null){
+      console.log('err : ' +err);
+    }
+    else{
+      console.log(a_u_p+" success!");
+    }
+    var child_second = exec("cp /home/js/Desktop/workspace/appcompat_v7/libs/android-support-v4 /home/js/Desktop/workspace/MyDrawerApp/libs/android-support-v4 ",function(err,stdout,stderr){
+      sys.print('stdout : '+ stdout);
+      sys.print('stderr : '+ stderr);
+      //response.send(stdout);
+      if(err !== null){
+        console.log('err : ' +err);
+      }
+      else{
+        console.log(cp+" success!");
+      }
+    });
+
+    var child_third = exec("cp /home/js/Desktop/workspace/test.keystore /home/js/Desktop/workspace/MyDrawerApp/test.keystore ",function(err,stdout,stderr){
+      sys.print('stdout : '+ stdout);
+      sys.print('stderr : '+ stderr);
+      response.send(stdout);
+      if(err !== null){
+        console.log('err : ' +err);
+      }
+      else{
+        console.log(cp+" success!");
+      }
+    });
+  });
+  
+});
+app.get('/btm_menu_run', function(request, response){
+  console.log("run start!");
+  var child_third = exec("ant clean release",function(err,stdout,stderr){
+      sys.print('stdout : '+ stdout);
+      sys.print('stderr : '+ stderr);
+      response.send(stdout);
+      if(err !== null){
+        console.log('err : ' +err);
+      }
+      else{
+        console.log(cp+" success!");
+      }
+    });
+});

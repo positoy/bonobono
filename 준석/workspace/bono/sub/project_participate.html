@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+        <script>
+            $(function(){
+                $("#btn_pparticipate").click(function(){
+                    var user_id = $("#form_id").val();
+                    var project_name = $("#form_pname").val();;
+                    if(user_id != "" && project_name != ""){
+                        $.post("/project_participate", {userId : user_id, projectName : project_name}, function(data){
+                            if(data == "project_participate_successed"){
+                                alert("project participation successful")
+                            }
+                            else{
+                                // case1. 존재하지 않는 프로젝트입니다.
+                                alert("Please Chk Id / Pwd");
+                            }
+                        });
+                    }
+                    else{
+                        alert("Please Chk Id / Pwd");
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="project_participate_form">
+            <div class="project_participate_forms">
+                <input type="text" placeholder="My ID" name="user_id" id="form_id"/>
+            </div> 
+            <div class="project_participate_forms">
+                <input type="text" placeholder="Project Name" name="project_name" id="form_pname"/>
+            </div>
+            <div class="project_participate_forms">
+                <input type="button" value="Participate in the Project" id="btn_pparticipate"/>
+            </div>
+        </div>
+    </body>
+</html>

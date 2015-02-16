@@ -6,6 +6,7 @@
 */
 var fs = require('fs');
 
+<<<<<<< HEAD
 var _getDirList = function(filePath, response) {
 	var dir = filePath;
 	var dirArr = new Array();
@@ -13,6 +14,13 @@ var _getDirList = function(filePath, response) {
 	
 	console.log("@!!!!!!!!!!!!!!!@!@#!@#@! : " + dir);
 	
+=======
+var _getDirList = function(request, response) {
+	var dir = request.body.dir;
+	var dirArr = new Array();
+	var fileArr = new Array();
+	
+>>>>>>> def35d81fb80e01ab342507db5b7ca8c7423dfba
 	var r = '<ul class="jqueryFileTree" style="display: none;">';
    	try {
        	r = '<ul class="jqueryFileTree" style="display: none;">';
