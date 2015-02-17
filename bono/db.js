@@ -357,10 +357,17 @@ function projectinfo_create_ (user_id, project_name, project_desc, project_creat
 
     var context = "[/project_create, DB]";
 
+<<<<<<< HEAD
     // 1. 동일한 이름의 프로젝트가 이미 존재하는지 확
     var query = connection.query("SELECT * FROM projectinfo WHERE project_name = ?", project_name,
 
         function(err, rows) {
+=======
+    // 1. 동일한 이름의 프로젝트가 이미 존재하는지 확인
+     var query = connection.query("SELECT * FROM projectinfo WHERE project_name = ?", project_name,
+
+      function(err, rows) {
+>>>>>>> 585fe1b3200eb8a04f29036bbba629b137af7493
 
             if (err)
             {
