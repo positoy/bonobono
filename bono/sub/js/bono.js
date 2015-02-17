@@ -1,1 +1,0 @@
-var bono = require('./bono.js');
