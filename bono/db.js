@@ -357,8 +357,9 @@ function projectinfo_create_ (user_id, project_name, project_desc, project_creat
 
     var context = "[/project_create, DB]";
 
-    // 1. 동일한 이름의 프로젝트가 이ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa미 존재하는지 확
-timesd
+    // 1. 동일한 이름의 프로젝트가 이미 존재하는지 확
+    var query = connection.query("SELECT * FROM projectinfo WHERE project_name = ?", project_name,
+
         function(err, rows) {
 
             if (err)
@@ -411,7 +412,7 @@ timesd
                                     function git_create_handler()
                                     {
                                         // 5. projectinfo 에 새로운 프로젝트 추가
-                                        var query = connection.query("INSERT INTO projectinfo(project_name, description) VALUES(?, ?)", [project_name, project_desc],
+                                        var query = connection.query("INSERT INTO projectinfo(project_name, description, project_date) VALUES(?, ?, CURDATE())", [project_name, project_desc],
 
                                             function(err, result) {
 
