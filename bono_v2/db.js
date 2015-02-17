@@ -466,22 +466,47 @@ function projectinfo_info_ (project_name, project_info_handler, res) {
 
   var context = "[/project_info, DB]";
 
-  var query = connection.query('SELECT project_name AS "name", description AS "desc" FROM projectinfo WHERE project_name = ?', project_name,
+  var query = connection.query('SELECT projectinfo.project_name AS "name", projectinfo.description AS "desc", projectinfo.project_date AS "date", userproject.user_id AS "owner" FROM projectinfo LEFT JOIN userproject ON projectinfo.project_name = userproject.project WHERE projectinfo.project_name = ?', project_name,
 
     function(err, rows) {
 
-      console.log(query.sql);
       if (err)
       {
         console.log(context, "db error");
         console.error(err);
         project_info_handler(false, null, res);
+        throw err;
       }
       else
       {
-        console.log(rows[0]);
-        project_info_handler(true, rows[0], res);
-        console.log(context, "successful");
+        if (rows.length != 0)
+        {
+          var project_info = rows[0];
+
+          var query = connection.query('SELECT * FROM userproject WHERE project = ?', project_name,
+
+            function(err, rows) {
+
+              console.log(query.sql);
+              if (err)
+              {
+                console.log(context, "db error");
+                console.error(err);
+                project_info_handler(false, null, res);
+              }
+              else
+              {
+                project_info.member = rows.length;
+                project_info_handler(true, project_info, res);
+                console.log(context, "successful");
+              }
+            });
+        }
+        else
+        {
+          console.log(context, "DB seems to have invalid project in projectinfo, ", project_name);
+          project_info_handler(false, null, res);
+        }
       }
     });
 }
@@ -514,6 +539,7 @@ function invitation_invite_ (user_id, inv_id, inv_project, inv_msg, project_invi
             {
                 console.log(context, "db error");
                 console.log(err)
+                project_invite_handler(false, res);
                 throw err;
             }
             else if (rows.length == 0)
@@ -533,6 +559,7 @@ function invitation_invite_ (user_id, inv_id, inv_project, inv_msg, project_invi
                   {
                     console.log(context, "db error2");
                     console.log(err);
+                    project_invite_handler(false, res);
                     throw err;
                   }
                   else if (rows.length == 0)
@@ -552,6 +579,7 @@ function invitation_invite_ (user_id, inv_id, inv_project, inv_msg, project_invi
                         {
                           console.log(context, "db error3");
                           console.log(err);
+                          project_invite_handler(false, res);
                           throw err;
                         }
                         else if (rows.length != 0)

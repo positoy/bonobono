@@ -221,10 +221,17 @@ $(document).ready(function() {
 		$.get("/project_info?project=" + proj_name, function(data, status){
 
 			// 과연 get 메세지는 객체를 수신할 수 있을 것인가?!
-			console.log(data);
-			if (data != null){
+			var date_str = "";
+			console.log(typeof data)
+			if (typeof data === "object")
+			{
 				// 프로젝트 정보 붙여주기
-				$("#dialog_select_project_info_contents").html("<p>Project Name : " + data.name + "</p><p>Description : " + data.desc + "</p><p>Project Owner : " + data.owner + "</p><p>Date : " + data.date + "</p><p>Members : " + data.member + "</p>");
+				date_str = data.date.substr(0, 10	);
+				$("#dialog_select_project_info_contents").html("<p>Project Name : " + data.name + "</p><p>Description : " + data.desc + "</p><p>Project Owner : " + data.owner + "</p><p>Date : " + date_str + "</p><p>Members : " + data.member + "</p>");
+			}
+			else
+			{
+				$("#dialog_select_project_info_contents").html("<p>project not exist</p>");
 			}
 		});
 	});
@@ -263,37 +270,6 @@ $(document).ready(function() {
 			"quit": {name: "Quit", icon: "quit"}
 	        }
 		});
-	});
-
-	// ************************************************
-
-
-	$("#btn_pinvite").click(function() {
-		var user_id = $("#form_id").val();
-
-		var inv_id = $("#form_inv_id").val();
-		var inv_project = $("#form_inv_project").val();
-		var inv_msg = $("#form_inv_msg").val();
-
-		if (user_id != "" && inv_id != "" && inv_project != "" && inv_msg != "") {
-			$.post("/project_invite", {
-				id : user_id,
-				inv_id : inv_id,
-				inv_project : inv_project,
-				inv_msg : inv_msg
-			}, function(data) {
-				if (data == "project_invite_successed") {
-					alert("project invitation successful")
-				} else {
-					// case1. 존재하지 않는 상대방입니다.
-					// case2. 존재하지 않는 프로젝트입니다.
-					// case3. 상대방이 이미 프로젝트에 참여중입니다.
-					alert("Please Chk Id / Pwd");
-				}
-			});
-		} else {
-			alert("Please Chk Id / Pwd");
-		}
 	});
 
 
