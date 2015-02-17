@@ -357,9 +357,10 @@ function projectinfo_create_ (user_id, project_name, project_desc, project_creat
 
     var context = "[/project_create, DB]";
 
-    // 1. 동일한 이름의 프로젝트가 이ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa미 존재하는지 확
-timesd
-        function(err, rows) {
+    // 1. 동일한 이름의 프로젝트가 이미 존재하는지 확인
+     var query = connection.query("SELECT * FROM projectinfo WHERE project_name = ?", project_name,
+
+      function(err, rows) {
 
             if (err)
             {
