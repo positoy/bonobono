@@ -1,4 +1,6 @@
-var git = require('./git_commit.js');
+var git = require('./git_ver4.js');
+
+// git module final check
 
 //**************개발 이슈**************************//
 ////////0.
