@@ -58,7 +58,7 @@ exports.create_new_bare = function(project_name, user_name, handler) {
 			{
 				console.log("successful: " + cmd);
 				console.log("create user's git completed.");
-				callback(null);
+				callback(null,true);
 			}
 		});
 	};
@@ -104,7 +104,7 @@ exports.our_join = function(project_name, user_name, handler) {
 			{
 				console.log("successful: " + cmd);
 				console.log("join completed.");
-				callback(null);
+				callback(null,true);
 			}
 		});
 	};
@@ -163,7 +163,7 @@ exports.our_commit = function(project_name, user_name, commit_message, handler) 
 			else
 			{
 				console.log("successful: " + cmd);
-				callback(null);
+				callback(null,true);
 			}
 		});
 	};
@@ -199,7 +199,7 @@ exports.our_push = function(project_name, user_name, handler) {
 			else
 			{
 				console.log("successful: " + cmd + " : push completed. congratulations!");
-				callback(null);
+				callback(null,true);
 			}
 		});
 
