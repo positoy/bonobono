@@ -244,7 +244,8 @@ $(document).ready(function() {
 			currentProject = target;
 			user_id = getParameterByName('id');
 			fileTreePath = currentProject + "/_" + user_id + "/";
-			console.log(fileTreePath);
+			
+			$.get('/updatetarget?path=' +fileTreePath);
 
 			make_fileTree(fileTreePath);
 			$("#dialog_select_project").dialog("close");

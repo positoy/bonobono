@@ -16,7 +16,7 @@ exports.create = function(project_name, user_name, user_email, handler) {
 	var DIR_PROJECT = __DIR + project_name;
 	var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
 	var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
-
+	
 	console.log(context, project_name)
 
 	// condition check
@@ -106,7 +106,7 @@ exports.create = function(project_name, user_name, user_email, handler) {
 				console.log(context, "error-", cmd);
 				console.log(error);
 			}
-			else
+			else	
 			{
 				console.log(context, "successful-", cmd)
 				callback(null);
@@ -119,8 +119,9 @@ exports.create = function(project_name, user_name, user_email, handler) {
 	{
 		var cmd1 = "cp -rf ./user_data/build/appcompat_v7 " + DIR_PROJECT;
 		var cmd2 = "cp " + DIR_PROJECT + "/appcompat_v7/libs/android-support-v4.jar " + DIR_PROJECT_USER + "/libs"
+		//var cmd3 = "cp ./user_data/build/test.keystore " + DIR_PROJECT_USER;
 
-		var cmd = cmd1 + ";" + cmd2;
+		var cmd = cmd1 + ";" + cmd2 + ";";// + cmd3;
 
 		var child = exec(cmd, function(error, stdout, stderr) {
 
@@ -131,10 +132,25 @@ exports.create = function(project_name, user_name, user_email, handler) {
 			}
 			else
 			{
+
+
 				console.log(context, "successful-", cmd)
 				callback(null);
 			}
 		});
+
+	//	fs.readFile(DIR_PROJECT_USER+"/local.properties", 'utf8', function(err, data) {
+ 	//		var n = data.search("target=");
+	//
+	//		var resTarget = data.substring(n+7,data.length-1);
+	//		console.log("res : " + resTarget);
+//
+	//		_GLOBAL.cur_project_target = resTarget;
+	//	});
+
+		
+
+
 	};
 
 	// git add, commit, push

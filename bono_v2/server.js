@@ -28,6 +28,14 @@ app.use(express.Router());
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var __DIR = './user_data/projects/';
+
+var _GLOBAL={};
+//_GLOBAL.project_name					// test2
+//_GLOBAL.cur_project_path				//./user_data/projects/test2
+//_GLOBAL.cur_project_path				//./user_data/projects/test2
+//_GLOBAL.cur_project_target			//ex)android-15
+
 
 // method - get /
 app.get('/', function(req, res){
@@ -85,6 +93,10 @@ app.get('/project_info', function(req, res){
 
 	var context = "[/project_info] : ";
 	var project_name = req.param("project");
+	_GLOBAL.project_name = project_name;
+	_GLOBAL.project_path = __DIR+project_name;
+	console.log("js: proj_name "+_GLOBAL.project_name);
+	console.log("js: proj_path "+_GLOBAL.project_path);
 
 	console.log(context, "project information request");
 
@@ -119,8 +131,52 @@ app.get('/btm_menu_run', function(request, response){
 
 	var path = "./user_data/projects/" + project_name + "/_" + user_id;
 
+	console.log(_GLOBAL.cur_project_target);
+	console.log(path);
+	fs.readFile(path+"/test.keystore", 'utf8', function(err, data) {
+  		if(err){
+  			var cmd = "cp ./user_data/build/test.keystore " + path+"/test.keystore";
+  			var key = exec(cmd, function(error, stdout, stderr) {
+
+				if (error !== null)
+				{
+					console.log(error);
+				}
+				else
+				{
+					console.log(context, "key successful-", cmd)
+					//callback(null);
+				}
+			});
+  		}		
+  	});
+
+
+
+	var filecontent;
+	var key_none;
+	//local.properties update
+	fs.readFile(path+"/local.properties", 'utf8', function(err, fd) {
+		console.log(path+"/local.properties");	
+		//console.log("read success\n"+fd);
+		if(err) throw err;
+		filecontent=fd;
+		//console.log("change\n"+filecontent);
+  		key_none = filecontent.search("#key");
+  		console.log("key is " + key_none);
+  		if(key_none===-1){
+  			filecontent = filecontent + "#key\nkey.store=./test.keystore\nkey.alias=test\nkey.store.password=helloworld\nkey.alias.password=helloworld\n";
+  			console.log("change\n"+filecontent);
+  			fs.writeFile(path+"/local.properties", filecontent, function(err) {
+  				if(err) throw err;
+  				console.log('File write completed');
+			});
+  		}
+  	});	
+  	
+  	
 	// 빌드 끝내고 apk 파일도 전송해 줘야함.
-	var child = exec("cd " + path +"; ant clean release", function(err, stdout ,stderr){
+	var child = exec("cd " + path +"; "+ " ant clean release", function(err, stdout ,stderr){
 
 		if (err === null)
 		{
@@ -138,6 +194,55 @@ app.get('/btm_menu_run', function(request, response){
 });
 
 
+
+
+
+app.get('/updatetarget', function(req, res){
+
+	var filePath = req.param('path');
+
+	//console.log("+++++++++++++++++++++++ : " + filePath);
+
+
+	_GLOBAL.cur_project_path = "./user_data/projects/"+filePath;
+	console.log("readfilejs "+_GLOBAL.cur_project_path);
+	
+	fs.readFile(_GLOBAL.cur_project_path+"project.properties", 'utf8', function(err, data) {
+ 		var n = data.search("target=");
+	
+		var resTarget = data.substring(n+7,data.length-1);
+		console.log("res : " + resTarget);
+
+		_GLOBAL.cur_project_target = resTarget;
+		//console.log("again : "+ _GLOBAL.cur_project_target);
+		
+
+		var child = exec("cd " + _GLOBAL.cur_project_path +"; android update project -p . -t "+ _GLOBAL.cur_project_target +";" + " cd ../appcompat_v7; "+ "android update project -p . -t "+ _GLOBAL.cur_project_target +"; " , function(err, stdout ,stderr){
+			var context = "[/update target] : ";
+
+			//console.log(context, "connected");
+			//console.log("in "+ _GLOBAL.cur_project_target);
+			if (err === null)	
+			{
+				console.log(context, "	successful");
+				sys.print('stdout : '+ stdout);
+				res.send(stdout);
+			}
+			else
+			{
+				console.log(context, "error");
+				sys.print('stderr : ' + stderr);
+				res.send(stderr);
+			}
+		});
+	});
+	
+
+	
+
+});
+
+
 /**********************************************************************
 												POST MESSAGE HANDLERS
 **********************************************************************/
@@ -151,7 +256,6 @@ app.post('/login', function(req, res){
 
 	var user_id = req.body.id;
 	var user_pwd = req.body.pwd;
-
 	console.log(context, user_id, "login request");
 
 	function login_handler(login_successful, res)
@@ -294,6 +398,7 @@ app.post('/req_filetree', function(req, res){
 		//req.body.dir = dir.substr(__PROJECT_BASE_DIR.length);
 		dir = __PROJECT_BASE_DIR.concat(dir);
 	}
+
 
 	console.log("File Tree : " +dir);
 
