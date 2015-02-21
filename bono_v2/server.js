@@ -334,6 +334,7 @@ app.post('/openFile', function(req, res){
 /********************
  PROJECT INVITE LIST
 *********************/
+/*
 io.of('/project_invitelist')
 	.on('connection', function(socket){
 
@@ -407,7 +408,86 @@ io.of('/project_invitelist')
 			db.user.login(o.user, o.password, login_handler, socket);
 		});
 });
+*/
 
+
+/*********************
+  EDITOR CONTEXT
+ *********************/
+
+io.of('/eidtor')
+	.on('connection', function(socket){
+
+		var context = "[/project_invitelist] : ";
+		console.log(context, "a user connected (socket.io)");
+
+		// COMMIT
+		socket.on('commit',function(user_id){
+
+			// DB에서 사용자 프로젝트 목록 가져오기
+			// project item : {name, desc, member(null), date(null), owner(null)}
+
+			function invitelist_request_handler(arr, socket)
+			{
+				var socket = socket;
+
+				// successful		arr.length != 0
+				// failure			arr.length == 0
+				socket.emit('push', JSON.stringify(arr));
+			}
+
+			db.invitation.list(user_id, invitelist_request_handler, socket);
+		});
+
+		// PUSH
+		socket.on('pull', function(json){
+
+			var obj = JSON.parse(json);
+			var user_id = obj.id;
+			var project_name = obj.project;
+
+			function invitelist_accept_handler(invite_accept_successful, socket)
+			{
+				var socket = socket;
+
+				if (invite_accept_successful)
+				{
+					socket.emit('invitelist_accept_response', 'success');
+				}
+				else
+				{
+					socket.emit('invitelist_accept_response', 'failure');
+				}
+			}
+
+			// execute db
+			db.user.login(o.user, o.password, login_handler, socket);
+		});
+
+		// PULL
+		socket.on('invitelist_decline',function(json){
+
+			var o = JSON.parse(json);
+
+			console.log("[login, " + o.user + "] : login request.");
+
+			// for db
+			// handler
+			function login_handler(login_successful, socket)
+			{
+				var socket = socket;
+
+				if (login_successful) {
+					socket.emit('list_response', 'success');
+				} else {
+					socket.emit('list_response', 'failure');
+				}
+			}
+
+			// execute db
+			db.user.login(o.user, o.password, login_handler, socket);
+		});
+});
 
 // server start listening
 http.listen(8000, function(){
