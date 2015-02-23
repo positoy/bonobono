@@ -4,6 +4,7 @@ var path = require('path');
 // BONOBONO MODULES
 var db = require('./db.js')();
 var git = require('./git.js');
+var gitTree = require('./git_log.js')();
 
 // express 4.0
 var express = require('express');
@@ -35,7 +36,6 @@ var _GLOBAL={};
 //_GLOBAL.cur_project_path				//./user_data/projects/test2
 //_GLOBAL.cur_project_path				//./user_data/projects/test2
 //_GLOBAL.cur_project_target			//ex)android-15
-
 
 // method - get /
 app.get('/', function(req, res){
@@ -118,6 +118,121 @@ app.get('/project_info', function(req, res){
 	db.projectinfo.info(project_name, project_info_handler, res);
 
 });
+
+//*************************************************************************************
+//*********
+//GitTree
+//*********
+function draw_handler(_finalObject, res) {
+	var log_diff_cnt = 0;
+	var origin_pos = _finalObject.origin_position;
+	var my_pos = _finalObject. my_position;
+	var res_html = "";
+	var arr_length = _finalObject.originLogTreeArray.length - 1;
+	
+	console.log("draw_handler======================");
+	console.log(typeof(_finalObject));	//object
+	console.log(_finalObject);
+
+	//이 부분에서 ******************************
+	//사용자가 push나 pull을 누를때마다,
+	//받아온 _finalObject의 finalArray를 가지고 
+	//origin폴더와 _mahabono폴더의 commit hash를 비교해서
+	//ui 생성해주면 될듯
+	//
+	// 1. 내가 pull을 하면 => finalObject.my_position 갱신
+	// 2. 나를 제외한 다른 팀원들이 push를 하면 => finalObject.origin_position 갱신 
+	// ( origin 폴더의 git log가 갱신되는 시점은, 
+	//   사용자가 pull을 하고, 그다음 push를 하면 갱신된 log를 추가 )
+	//****************************************
+
+	//git log가 존재 안하면
+	if(_finalObject.origin_no_commits_flag || _finalObject.user__no_commits_flag) 
+	{
+		if(_finalObject.origin_no_commits_flag) 
+		{
+			//console.log("origin no commit");
+			//***************************
+			//origin에 git log아무것도 없을 때의 동작
+			//***************************
+		}
+
+		if(_finalObject.user_no_commits_flag) 
+		{
+			//console.log(_finalObject.my_name + " no commit");
+			//***************************
+			//_user_name folder에 git log아무것도 없을 때의 동작
+			//***************************
+		}
+		
+	}
+	//git log가 존재하면
+	else
+	{	
+		//log_diff_cnt 동작  -- 일단 이건 무시함......
+		for(idx in _finalObject.originLogTreeArray)
+		{
+			if(_finalObject.originLogTreeArray[idx].commit_hash !== _finalObject.my_position) 
+			{
+				log_diff_cnt++;
+			}	
+			else
+			{
+				break;
+			}
+		}
+		
+		for(var i=0; i<log_diff_cnt; i++)
+		{
+			//*********************************
+			//update가 필요한 git log들을 그려준다.
+			//*********************************
+
+			var com_msg = _finalObject.originLogTreeArray[i].commit_msg;
+			if(com_msg.length > 30){
+				var temp = com_msg.slice(0, 30);
+				com_msg = temp.concat("...");
+			}
+			if(origin_pos === _finalObject.originLogTreeArray[i].commit_hash){
+				res_html += '<div class="git_tree_node node_origin" data-hash="' 
+						  + _finalObject.originLogTreeArray[i].commit_hash + '" data-name="' 
+						  + _finalObject.originLogTreeArray[i].committer_name + '" data-date="' 
+						  + _finalObject.originLogTreeArray[i].commit_date + '" data-msg="' 
+						  + com_msg + '"></div>';
+			}else if(my_pos === _finalObject.originLogTreeArray[i].commit_hash){
+				res_html += '<div class="git_tree_node node_user" data-hash="' 
+						  + _finalObject.originLogTreeArray[i].commit_hash + '" data-name="' 
+						  + _finalObject.originLogTreeArray[i].committer_name + '" data-date="' 
+						  + _finalObject.originLogTreeArray[i].commit_date + '" data-msg="' 
+						  + com_msg + '"></div>';
+			}else if(origin_pos === _finalObject.originLogTreeArray[i].commit_hash && my_pos === _finalObject.originLogTreeArray[i].commit_hash){
+				res_html += '<div class="git_tree_node node_origin_user" data-hash="' 
+						  + _finalObject.originLogTreeArray[i].commit_hash + '" data-name="' 
+						  + _finalObject.originLogTreeArray[i].committer_name + '" data-date="' 
+						  + _finalObject.originLogTreeArray[i].commit_date + '" data-msg="' 
+						  + com_msg + '"></div>';
+			}else{
+				res_html += '<div class="git_tree_node node_normal" data-hash="' 
+						  + _finalObject.originLogTreeArray[i].commit_hash + '" data-name="' 
+						  + _finalObject.originLogTreeArray[i].committer_name + '" data-date="' 
+						  + _finalObject.originLogTreeArray[i].commit_date + '" data-msg="' 
+						  + com_msg + '"></div>';
+			}
+			if(i != arr_length)
+				res_html += "<div class='git_tree_edge'></div>";
+		}
+	}
+	res.send(res_html);
+}
+
+//****push pull 버튼을 누를때마다 실행되게
+app.get('/makeTree', function(req, res){
+			//*****요 프로젝트 이름 넣어주는 부분을 select project할때 변수에 저장해서 ㄱㄱ
+	var res_html = gitTree.logTree('p_name','jinoobono', draw_handler, res);
+	console.log(res_html);
+});
+
+//*************************************************************************************
 
 //child : run
 app.get('/btm_menu_run', function(request, response){
