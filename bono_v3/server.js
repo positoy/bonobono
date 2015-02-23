@@ -180,14 +180,9 @@ function draw_handler(_finalObject, res) {
 			{
 				break;
 			}
-		}
+		}		
 		
-		for(var i=0; i<log_diff_cnt; i++)
-		{
-			//*********************************
-			//update가 필요한 git log들을 그려준다.
-			//*********************************
-
+		for(var i in _finalObject.originLogTreeArray){
 			var com_msg = _finalObject.originLogTreeArray[i].commit_msg;
 			if(com_msg.length > 30){
 				var temp = com_msg.slice(0, 30);
@@ -221,6 +216,8 @@ function draw_handler(_finalObject, res) {
 			if(i != arr_length)
 				res_html += "<div class='git_tree_edge'></div>";
 		}
+		
+		//console.log(res_html);
 	}
 	res.send(res_html);
 }
