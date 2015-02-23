@@ -134,18 +134,6 @@ function draw_handler(_finalObject, res) {
 	console.log(typeof(_finalObject));	//object
 	console.log(_finalObject);
 
-	//이 부분에서 ******************************
-	//사용자가 push나 pull을 누를때마다,
-	//받아온 _finalObject의 finalArray를 가지고 
-	//origin폴더와 _mahabono폴더의 commit hash를 비교해서
-	//ui 생성해주면 될듯
-	//
-	// 1. 내가 pull을 하면 => finalObject.my_position 갱신
-	// 2. 나를 제외한 다른 팀원들이 push를 하면 => finalObject.origin_position 갱신 
-	// ( origin 폴더의 git log가 갱신되는 시점은, 
-	//   사용자가 pull을 하고, 그다음 push를 하면 갱신된 log를 추가 )
-	//****************************************
-
 	//git log가 존재 안하면
 	if(_finalObject.origin_no_commits_flag || _finalObject.user__no_commits_flag) 
 	{
@@ -222,9 +210,10 @@ function draw_handler(_finalObject, res) {
 	res.send(res_html);
 }
 
-//****push pull 버튼을 누를때마다 실행되게
+//****pull push commit 버튼을 누를때마다 실행되게
 app.get('/makeTree', function(req, res){
 			//*****요 프로젝트 이름 넣어주는 부분을 select project할때 변수에 저장해서 ㄱㄱ
+			//*****사용자 이름 넣어주는 부분을 login할때 변수에 저장해서 ㄱㄱ
 	var res_html = gitTree.logTree('p_name','jinoobono', draw_handler, res);
 	console.log(res_html);
 });
