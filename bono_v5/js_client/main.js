@@ -13,6 +13,17 @@ var fileTreePath = "";
 
 var socket;
 
+
+
+
+
+var tttt = 0;
+
+
+
+
+
+
 function getParameterByName(name) {
 		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
 		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -560,7 +571,11 @@ $(document).ready(function() {
 		socket = io();
 		console.log("connect to socket.io");
 		
-	
+
+
+		/////////////////
+		// SEND
+		/////////////////	
 		$(".git_button").click(function() {
 			$(".git_commit").toggleClass("git_btn_container_open_commit", 1000, 'easeInOutBack');
 			$(".git_push").toggleClass("git_btn_container_open_push", 1100, 'easeInOutBack');
@@ -572,7 +587,8 @@ $(document).ready(function() {
 			if(git_case == "commit"){
 				socket.emit("commit", {id: _GLOBAL.id, project: _GLOBAL.project});
 				$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
-					console.log("/makeGitTree complete");
+					tttt++;
+					console.log("/makeGitTree complete ------- " +tttt);
 					$("#git_tree_container").empty();
 					$("#git_tree_container").append(data);
 				});
@@ -585,31 +601,6 @@ $(document).ready(function() {
  
 
 
-		/////////////////
-		// SEND
-		/////////////////
-
-	/*
-		$("#git_pull").click(function(){
-				$(this).html("pull<br/>(waiting)");
-				socket.emit("pull", {id: _GLOBAL.id, project: _GLOBAL.project});
-			});
-	
-			$("#git_commit").click(function(){
-				$(this).html("commit<br/>(waiting)");
-				socket.emit("commit", {id: _GLOBAL.id, project: _GLOBAL.project});
-				$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
-					console.log("/makeGitTree complete");
-					$("#git_tree_container").empty();
-					$("#git_tree_container").append(data);
-				});
-			});
-	
-			$("#git_push").click(function(){
-				$(this).html("push<br/>(waiting)");
-				socket.emit("push", {id: _GLOBAL.id, project: _GLOBAL.project});
-			});
-			*/
 	
 
 
@@ -622,7 +613,7 @@ $(document).ready(function() {
 			if (data === null)
 			{
 				alert("프로젝트를 먼저 로드하세요.");
-				$("#git_pull").html("pull");
+				//$("#git_pull").html("pull");
 				return;
 			}
 
@@ -641,7 +632,7 @@ $(document).ready(function() {
 			else
 				console.log("pull fail.", data.reason);
 
-			$("#git_pull").html("pull");
+			//$("#git_pull").html("pull");
 
 		});
 
@@ -651,7 +642,7 @@ $(document).ready(function() {
 			if (data === null)
 			{
 				alert("프로젝트를 먼저 로드하세요.");
-				$("#git_commit").html("commit");
+				//$("#git_commit").html("commit");
 				return;
 			}
 
@@ -669,7 +660,7 @@ $(document).ready(function() {
 				}
 			}
 
-			$("#git_commit").html("commit");
+			//$("#git_commit").html("commit");
 
 		});
 
@@ -679,7 +670,7 @@ $(document).ready(function() {
 			if (data === null)
 			{
 				alert("프로젝트를 먼저 로드하세요.");
-				$("#git_push").html("push");
+				//$("#git_push").html("push");
 				return;
 			}
 
@@ -691,7 +682,7 @@ $(document).ready(function() {
 			else
 				console.log("push fail.", data.reason);
 
-			$("#git_push").html("push");
+			//$("#git_push").html("push");
 
 		});
 
