@@ -557,6 +557,11 @@ $(document).ready(function() {
 		$("#git_commit").click(function(){
 			$(this).html("commit<br/>(waiting)");
 			socket.emit("commit", {id: _GLOBAL.id, project: _GLOBAL.project});
+			$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
+				console.log("/makeGitTree complete");
+				$("#git_tree_container").empty();
+				$("#git_tree_container").append(data);
+			});
 		});
 
 		$("#git_push").click(function(){

@@ -183,11 +183,30 @@ function draw_handler(_finalObject, res) {
 	var origin_pos = _finalObject.origin_position;
 	var my_pos = _finalObject. my_position;
 	var res_html = "";
-	var arr_length = _finalObject.originLogTreeArray.length - 1;
+	var drawTreeArray = [];
+	var arr_length;
+	
 	
 	console.log("draw_handler======================");
-	console.log(typeof(_finalObject));	//object
+	//console.log(typeof(_finalObject));	//object
 	console.log(_finalObject);
+	console.log("origin:" + _finalObject.originLogTreeArray.length);
+	console.log("user:" + _finalObject.userLogTreeArray.length);
+
+
+	if(_finalObject.originLogTreeArray.length <= _finalObject.userLogTreeArray.length) 
+	{	
+		drawTreeArray = _finalObject.userLogTreeArray;
+	}
+	else
+	{
+		drawTreeArray = _finalObject.originLogTreeArray;
+	}
+	//console.log("drawTree:" + drawTreeArray.length);
+	//console.log(drawTreeArray);
+
+	arr_length = drawTreeArray.length - 1;
+
 
 	//git log가 존재 안하면
 	if(_finalObject.origin_no_commits_flag || _finalObject.user__no_commits_flag) 
@@ -212,6 +231,8 @@ function draw_handler(_finalObject, res) {
 	//git log가 존재하면
 	else
 	{	
+		
+		//_finalObject.originLogTreeArray 로 되어있는 부분 수정 필요
 		//log_diff_cnt 동작  -- 일단 이건 무시함......
 		for(idx in _finalObject.originLogTreeArray)
 		{
@@ -223,38 +244,41 @@ function draw_handler(_finalObject, res) {
 			{
 				break;
 			}
-		}		
+		}
+
+		console.log("drawTree:" + drawTreeArray.length);
+		console.log(drawTreeArray);		
 		
-		for(var i in _finalObject.originLogTreeArray){
-			var com_msg = _finalObject.originLogTreeArray[i].commit_msg;
+		for(var i in drawTreeArray){
+			var com_msg = drawTreeArray[i].commit_msg;
 			if(com_msg.length > 30){
 				var temp = com_msg.slice(0, 30);
 				com_msg = temp.concat("...");
 			}
-			if(origin_pos === _finalObject.originLogTreeArray[i].commit_hash){
+			if(origin_pos === drawTreeArray[i].commit_hash){
 				res_html += '<div class="git_tree_node node_origin" data-hash="' 
-						  + _finalObject.originLogTreeArray[i].commit_hash + '" data-name="' 
-						  + _finalObject.originLogTreeArray[i].committer_name + '" data-date="' 
-						  + _finalObject.originLogTreeArray[i].commit_date + '" data-msg="' 
-						  + com_msg + '"></div>';
-			}else if(my_pos === _finalObject.originLogTreeArray[i].commit_hash){
+						  + drawTreeArray[i].commit_hash + '" data-name="' 
+						  + drawTreeArray[i].committer_name + '" data-date="' 
+						  + drawTreeArray[i].commit_date + '" data-msg="' 
+						  + com_msg + '">o</div>';
+			}else if(my_pos === drawTreeArray[i].commit_hash){
 				res_html += '<div class="git_tree_node node_user" data-hash="' 
-						  + _finalObject.originLogTreeArray[i].commit_hash + '" data-name="' 
-						  + _finalObject.originLogTreeArray[i].committer_name + '" data-date="' 
-						  + _finalObject.originLogTreeArray[i].commit_date + '" data-msg="' 
-						  + com_msg + '"></div>';
-			}else if(origin_pos === _finalObject.originLogTreeArray[i].commit_hash && my_pos === _finalObject.originLogTreeArray[i].commit_hash){
+						  + drawTreeArray[i].commit_hash + '" data-name="' 
+						  + drawTreeArray[i].committer_name + '" data-date="' 
+						  + drawTreeArray[i].commit_date + '" data-msg="' 
+						  + com_msg + '">m</div>';
+			}else if(origin_pos === drawTreeArray[i].commit_hash && my_pos === drawTreeArray[i].commit_hash){
 				res_html += '<div class="git_tree_node node_origin_user" data-hash="' 
-						  + _finalObject.originLogTreeArray[i].commit_hash + '" data-name="' 
-						  + _finalObject.originLogTreeArray[i].committer_name + '" data-date="' 
-						  + _finalObject.originLogTreeArray[i].commit_date + '" data-msg="' 
-						  + com_msg + '"></div>';
+						  + drawTreeArray[i].commit_hash + '" data-name="' 
+						  + drawTreeArray[i].committer_name + '" data-date="' 
+						  + drawTreeArray[i].commit_date + '" data-msg="' 
+						  + com_msg + '">o_m</div>';
 			}else{
 				res_html += '<div class="git_tree_node node_normal" data-hash="' 
-						  + _finalObject.originLogTreeArray[i].commit_hash + '" data-name="' 
-						  + _finalObject.originLogTreeArray[i].committer_name + '" data-date="' 
-						  + _finalObject.originLogTreeArray[i].commit_date + '" data-msg="' 
-						  + com_msg + '"></div>';
+						  + drawTreeArray[i].commit_hash + '" data-name="' 
+						  + drawTreeArray[i].committer_name + '" data-date="' 
+						  + drawTreeArray[i].commit_date + '" data-msg="' 
+						  + com_msg + '">n</div>';
 			}
 			if(i != arr_length)
 				res_html += "<div class='git_tree_edge'></div>";
@@ -828,6 +852,11 @@ io.on('connection', function(socket){
 			}
 
 			git.commit(data.project, data.id, commit_handler, socket);
+			var path = req.param('path');
+			var id = req.param('id');
+			console.log("/makeGitTree : " +path + " / " +id);
+			gitTree.logTree(path, id, draw_handler, res);
+			//console.log("&&&&&&&&&&&&&&&&&&&&&&&&&res_html = " +res_html);
 		});
 
 
