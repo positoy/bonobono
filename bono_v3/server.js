@@ -5,7 +5,7 @@ var path = require('path');
 var db = require('./db.js')();
 var git = require('./git.js');
 var gitTree = require('./git_log.js')();
-
+var contents_assist = require('./line.txt');
 // express 4.0
 var express = require('express');
 // serve_static - uploading server files to serve for client
