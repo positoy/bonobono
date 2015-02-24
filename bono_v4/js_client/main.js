@@ -60,6 +60,8 @@ $(document).ready(function() {
 				else {
 					prv_contents = cur_contents;
 					$.post('/file_save', {
+					 	id : _GLOBAL.id,
+					 	project : _GLOBAL.project,
 						fileName : file,
 						contents : editor.getValue()
 					}, function() {

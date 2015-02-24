@@ -569,12 +569,37 @@ app.post('/project_invite', function(req, res){
 app.post('/file_save', function(req, res){
 	var fileName = req.body.fileName;
 	var contents = req.body.contents;
+	var user_id = req.body.id;
+	var project_name = req.body.project;
+
+	var path = "./user_data/projects/" + project_name + "/_" + user_id;
 
 	fs.writeFile(fileName, contents, 'utf8', function(err){
 		if(err) throw err;
 		console.log("### Save Complete ###");
 	});
+	
+	console.log(_GLOBAL.cur_project_target);
+	console.log(path);
 
+	var antcompile = exec("cd " + path +"; "+ " ant compile", function(err, stdout ,stderr){
+
+		if (err === null)
+		{
+			console.log( "compile successful");
+			sys.print('stdout : '+ stdout);
+		
+		}
+		else
+		{
+			console.log("compile error");
+			var start = stdout.search("part!");
+			stdout = stdout.substring(start+6,stdout.length);
+			
+			sys.print(stdout);
+			//res.send(stderr);
+		}
+	});
 	res.sendStatus(200);
 });
 
