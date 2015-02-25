@@ -606,7 +606,7 @@ app.post('/file_save', function(req, res){
 					_ParseLog+=(  "statments : " + _LOG[3] +"\n");
 					var _tmp = _LOG[2].split(":");
 					_ParseLog += ("  state   :" + _tmp[3]);
-					
+				
 					var symbolindex = _tmp[3].search("symbol");
 					
 					if(symbolindex!==-1){
