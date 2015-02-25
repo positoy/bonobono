@@ -189,7 +189,7 @@ function draw_handler(_finalObject, res) {
 	
 	var context = "[draw_handler] : ";
 	console.log(context, "origin_length- ", _finalObject.originLogTreeArray.length +"\n" + "user_length- ", _finalObject.userLogTreeArray.length +"\n");
-	console.log("_finalObject: " + "\n" + _finalObject);
+	console.log("_finalObject: " + "\n" + JSON.stringify(_finalObject));
 
 
 	if(_finalObject.originLogTreeArray.length <= _finalObject.userLogTreeArray.length) 
@@ -550,7 +550,7 @@ app.post('/file_save', function(req, res){
 	console.log(path);
 
 	var antcompile = exec("cd " + path +"; "+ " ant compile", function(err, stdout ,stderr){
-
+		console.log(stdout);
 		if (err === null)
 		{
 			console.log( "compile successful");
@@ -608,30 +608,32 @@ app.post('/file_save', function(req, res){
 								_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
 								_ParseLog += (" location : " + _tmp[0] + "\n\n");
 							}
+							console.log(_ParseLog);
+				
 						}
 					}
-			else{
+					else{
 					
-				_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
-				var index = _tmp[0].search(user_id);
-				_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
-				_ParseLog += (" location : " + _tmp[0] + "\n\n");
-					
-
-				for(var i=4;i<_LOG.length;i++){
-					console.log("_LOG["+i+"] = " + _LOG[i]);
-					if((i)%3===0){
-						_ParseLog+=(  "statments : " + _LOG[i] +"\n");
-						var _tmp = _LOG[i-1].split(":");
-						_ParseLog += ("  state   :" + _tmp[3]);
-						_ParseLog += ("   line   : " + _tmp[1] + "\n");
+						_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
 						var index = _tmp[0].search(user_id);
 						_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
 						_ParseLog += (" location : " + _tmp[0] + "\n\n");
+					
+
+						for(var i=4;i<_LOG.length;i++){
+							console.log("_LOG["+i+"] = " + _LOG[i]);
+							if((i)%3===0){
+								_ParseLog+=(  "statments : " + _LOG[i] +"\n");
+								var _tmp = _LOG[i-1].split(":");
+								_ParseLog += ("  state   :" + _tmp[3]);
+								_ParseLog += ("   line   : " + _tmp[1] + "\n");
+								var index = _tmp[0].search(user_id);
+								_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
+								_ParseLog += (" location : " + _tmp[0] + "\n\n");
+							}
+							console.log(_ParseLog);
 						}
-				//console.log(_ParseLog);
-				}
-			}
+					}
 		}
 
 			_ParseLog = "Compile ERROR     :    "+ _LOG[_LOG.length-1] +"\n\n"+_ParseLog;
