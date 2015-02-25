@@ -322,7 +322,7 @@ exports.pull = function(project_name, user_name, pull_handler, socket) {
 /////////////////////////////
 // COMMIT
 /////////////////////////////
-exports.commit = function(project_name, user_name, commit_handler, socket) {
+exports.commit = function(project_name, user_name, _m, commit_handler, socket) {
 
 	var context = "[/editor, COMMIT] : ";
 
@@ -337,7 +337,7 @@ exports.commit = function(project_name, user_name, commit_handler, socket) {
 		//var cmd = "cd projects & cd " + project_name + "& cd _" + user_name + "&" + "git commit origin master";
 		var cmd1 = "cd " + DIR_PROJECT_USER;
 		var cmd2 = "git add --a";
-		var cmd3 = 'git commit -m "test message"';
+		var cmd3 = 'git commit -m \"' + _m +  '\"';
 
 		var cmd = cmd1 + ';' + cmd2 + ';' + cmd3;
 

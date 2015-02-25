@@ -582,7 +582,8 @@ $(document).ready(function() {
 		$(".git_smallBtn").click(function() {
 			var git_case = $(this).attr('title');
 			if(git_case == "commit"){
-				socket.emit("commit", {id: _GLOBAL.id, project: _GLOBAL.project});
+				var inputString = prompt('커밋메세지를 입력하세요.', 'commit message');
+				socket.emit("commit", {id: _GLOBAL.id, project: _GLOBAL.project, m: inputString});
 				$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
 					tttt++;
 					console.log("/makeGitTree complete ------- " +tttt);
