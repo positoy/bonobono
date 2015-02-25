@@ -576,7 +576,7 @@ app.post('/file_save', function(req, res){
 
 	fs.writeFile(fileName, contents, 'utf8', function(err){
 		if(err) throw err;
-		console.log("### Save Complete ###");
+		console.log("### Save Complete ###\n\n");
 	});
 	
 	console.log(_GLOBAL.cur_project_target);
@@ -592,9 +592,83 @@ app.post('/file_save', function(req, res){
 		}
 		else
 		{
-			console.log("compile error");
+			
 			var start = stdout.search("part!");
 			stdout = stdout.substring(start+6,stdout.length);
+			
+			stdout = stdout.replace(/(\r\n|\r|\n|\^)/gm,"");
+			stdout = stdout.replace(/(\s{2,})/g,' ');	
+			var _LOG = stdout.split("[javac] ");
+			var _ParseLog="";
+			var k=0;
+
+			if(_LOG.length>1){
+					_ParseLog+=(  "statments : " + _LOG[3] +"\n");
+					var _tmp = _LOG[2].split(":");
+					_ParseLog += ("  state   :" + _tmp[3]);
+					
+					var symbolindex = _tmp[3].search("symbol");
+					
+					if(symbolindex!==-1){
+							_LOG[5] = _LOG[5].replace("symbol:","import");
+							_ParseLog += ("   --->   " + _LOG[5] + "\n");
+							i++; 
+					
+
+
+					_ParseLog += ("   line   : " + _tmp[1] + "\n");
+					var index = _tmp[0].search(user_id);
+					_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
+					_ParseLog += (" location : " + _tmp[0] + "\n\n");
+					
+						for(var i = 7;i<_LOG.length;i++){
+							if((i)%5===3){
+								_ParseLog+=(  "statments : " + _LOG[i] +"\n");
+								var _tmp = _LOG[i-1].split(":");
+								_ParseLog += ("  state   :" + _tmp[3]);
+					
+								var symbolindex = _tmp[3].search("symbol");
+					
+
+								if(symbolindex!==-1){
+									i+=2;
+									_LOG[i] = _LOG[i].replace("symbol:","import");
+									_ParseLog += ("   --->   " + _LOG[i] + "\n");
+									i++; 
+								}
+								_ParseLog += ("   line   : " + _tmp[1] + "\n");
+								var index = _tmp[0].search(user_id);
+								_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
+								_ParseLog += (" location : " + _tmp[0] + "\n\n");
+							}
+						}
+					}
+			else{
+					
+				_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
+				var index = _tmp[0].search(user_id);
+				_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
+				_ParseLog += (" location : " + _tmp[0] + "\n\n");
+					
+
+				for(var i=4;i<_LOG.length;i++){
+					console.log("_LOG["+i+"] = " + _LOG[i]);
+					if((i)%3===0){
+						_ParseLog+=(  "statments : " + _LOG[i] +"\n");
+						var _tmp = _LOG[i-1].split(":");
+						_ParseLog += ("  state   :" + _tmp[3]);
+						_ParseLog += ("   line   : " + _tmp[1] + "\n");
+						var index = _tmp[0].search(user_id);
+						_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
+						_ParseLog += (" location : " + _tmp[0] + "\n\n");
+						}
+				//console.log(_ParseLog);
+				}
+			}
+		}
+
+			_ParseLog = "Compile ERROR     :    "+ _LOG[_LOG.length-1] +"\n\n"+_ParseLog;
+			console.log(_ParseLog);			
 			
 			sys.print(stdout);
 			//res.send(stderr);
