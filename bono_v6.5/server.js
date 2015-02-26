@@ -577,7 +577,7 @@ app.post('/file_save', function(req, res){
 							
 
 
-							_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
+							_ParseLog += ("   line   : " + _tmp[1] + "\n");
 							var index = _tmp[0].search(user_id);
 							_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
 							_ParseLog += (" location : " + _tmp[0] + "\n\n");
@@ -588,7 +588,7 @@ app.post('/file_save', function(req, res){
 										_ParseLog+=(  "statments : " + _LOG[i] +"\n");
 										var _tmp = _LOG[i-1].split(":");
 										_ParseLog += ("  state   :" + _tmp[3]);
-							
+										if(_tmp[3] == null){break;}
 										var symbolindex = _tmp[3].search("symbol");
 							
 
@@ -598,7 +598,7 @@ app.post('/file_save', function(req, res){
 											_ParseLog += ("   --->   " + _LOG[i] + "\n");
 											i++; 
 										}
-										_ParseLog += ("   line   : " + _tmp[1] + "\n");
+										_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
 										var index = _tmp[0].search(user_id);
 										_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
 										_ParseLog += (" location : " + _tmp[0] + "\n\n");

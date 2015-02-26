@@ -39,6 +39,8 @@ snippet j.n\n\
 	java.net.\n\
 snippet j.u\n\
 	java.util.\n\
+snippet a.w\n\
+	android.widget.\n\
 ##\n\
 ## Class\n\
 snippet cl\n\
@@ -70,13 +72,15 @@ snippet case\n\
 snippet def\n\
 	default:\n\
 		${2}\n\
-snippet el\n\
-	else\n\
+snippet else\n\
+	else{\n\
+	}\n\
 snippet elif\n\
 	else if (${1}) ${2}\n\
 snippet if\n\
-	if (${1}) ${2}\n\
-snippet sw\n\
+	if (${1}){\n\
+	} \n\
+snippet switch\n\
 	switch (${1}) {\n\
 		${2}\n\
 	}\n\
@@ -108,13 +112,13 @@ snippet errln\n\
 	System.err.println(\"${1:Message}\");\n\
 ##\n\
 ## Exception Handling\n\
-snippet as\n\
+snippet assert\n\
 	assert ${1:test} : \"${2:Failure message}\";${3}\n\
-snippet ca\n\
+snippet catch\n\
 	catch(${1:Exception} ${2:e}) ${3}\n\
-snippet thr\n\
+snippet throw\n\
 	throw\n\
-snippet ths\n\
+snippet throws\n\
 	throws\n\
 snippet try\n\
 	try {\n\
@@ -129,10 +133,12 @@ snippet tryf\n\
 	}\n\
 ##\n\
 ## Find Methods\n\
+snippet find\n\
+	findViewById(${3});${4}\n\
 snippet findall\n\
 	List<${1:listName}> ${2:items} = ${1}.findAll();${3}\n\
-snippet findbyid\n\
-	${1:var} ${2:item} = ${1}.findById(${3});${4}\n\
+##snippet findbyid\n\
+##	${1:var} ${2:item} = ${1}.findById(${3});${4}\n\
 ##\n\
 ## Javadocs\n\
 snippet /**\n\
@@ -161,9 +167,11 @@ snippet warn\n\
 snippet enfor\n\
 	for (${1} : ${2}) ${3}\n\
 snippet for\n\
-	for (${1}; ${2}; ${3}) ${4}\n\
-snippet wh\n\
-	while (${1}) ${2}\n\
+	for (${1}; ${2}; ${3}){\n\
+	}\n\
+snippet while\n\
+	while (${1}){\n\
+	}\n\
 ##\n\
 ## Main method\n\
 snippet main\n\
@@ -172,6 +180,8 @@ snippet main\n\
 	}\n\
 ##\n\
 ## Print Methods\n\
+snippet syso\n\
+	System.out.println(\"${1:Message}\");\n\
 snippet print\n\
 	System.out.print(\"${1:Message}\");\n\
 snippet printf\n\

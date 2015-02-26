@@ -38,7 +38,9 @@ snippet j.m\n\
 snippet j.n\n\
 	java.net.\n\
 snippet j.u\n\
-	java.util.\n\
+	java.util.\
+snippet a.u\n\
+	android.util.\n\
 ##\n\
 ## Class\n\
 snippet cl\n\
