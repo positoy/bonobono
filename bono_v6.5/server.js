@@ -961,7 +961,24 @@ io.on('connection', function(socket){
 		}); 
 		
 		// ****************************************************** 2.26
+ 		
 
+ 		//*************************//
+		// Enter the room 
+		//*************************//
+		socket.on("in", function(room_data) {
+			socket.join(room_data);
+			socket.p_name = room_data;
+			console.log("/////////////////socket room check///////////////////////");
+			console.log("User " + socket.handshake.address + " in at : " + socket.p_name);
+		});
+
+
+		socket.on("push_msg", function(data) {
+			console.log("/////////////////socket data check///////////////////////");			
+			console.log(data.id);
+			io.in(socket.p_name).emit("get_msg", data);
+		});
 
 
 		///////////////////
@@ -1026,11 +1043,12 @@ io.on('connection', function(socket){
 		///////////////////
 		// PUSH
 		///////////////////
-		socket.on('push',function(data){
+		socket.on('push',function(_data){
 
-			if (typeof data.project === "undefined")
+			if (typeof _data.project === "undefined")
 			{
-				socket.emit("push_response", null);
+				//socket.emit("push_response", null);
+				io.in(socket.p_name).emit("push_response",null);
 				return;
 			}
 
@@ -1040,17 +1058,24 @@ io.on('connection', function(socket){
 				var socket = socket;
 				var data = {};
 
+				data.id = _data.id;
+				data.project = _data.project;
 				data.reason = msg;
 
 				if (push_successful === true)
 					data.result = "successful";
 				else
 					data.result = "fail";
+				
 
-				socket.emit("push_response", data);
+				console.log("/////////////////socket data check///////////////////////");			
+				console.log(data.id, data.project);
+
+				io.in(socket.p_name).emit("push_response",null);
+				//socket.emit("push_response", data);
 			}
 
-			git.push(data.project, data.id, push_handler, socket);
+			git.push(_data.project, _data.id, push_handler, socket);
 		});
 
 });
