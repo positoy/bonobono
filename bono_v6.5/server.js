@@ -953,7 +953,7 @@ io.on('connection', function(socket){
 				socket.emit("commit_response", data);
 			}
 
-			git.commit(data.project, data.id, commit_handler, socket);
+			git.commit(data.project, data.id, data.m, commit_handler, socket);
 		});
 
 
