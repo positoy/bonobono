@@ -9,18 +9,13 @@ var user_id = "";
 var currentProject = "";
 var fileTreePath = "";
 
-var socket;
-
-
-
 var tttt = 0;
+
 
 // **************************** 2.26 ****************************
 var __filePath;
 var pupup_time = 2000;
 // **************************** 2.26 ****************************
-
-
 
 
 
@@ -41,6 +36,7 @@ $(document).ready(function() {
 	var editor;
 	var prv_contents;
 	var file_cnt = 0;
+	var socket = io();
 
 	// *********************************** 2.26 ****************************
 	// flag : is selected fileTree or top bar?
@@ -312,6 +308,13 @@ $(document).ready(function() {
 			});
 
 			make_fileTree(fileTreePath);
+
+		    //*************************//
+		    // Enter the room 
+		    //*************************//
+			socket.emit("in", _GLOBAL.project);
+
+
 			$("#dialog_select_project").dialog("close");
 		} else {
 			alert("Please Select a Project to open..");
@@ -650,14 +653,34 @@ $(document).ready(function() {
 					$("#git_tree_container").append(data);
 				});
 			}else if(git_case == "push"){
+
 				socket.emit("push", {id: _GLOBAL.id, project: _GLOBAL.project});
+			
 			}else if(git_case == "pull"){
+				
 				socket.emit("pull", {id: _GLOBAL.id, project: _GLOBAL.project});
+			
 			}
 		}); 
  
 
 
+			//*************************//
+		    // Enter the room 
+		    //*************************//
+		    //SEND
+			$("#btm_menu_subtract").click(function(){
+				socket.emit("push_msg", {id: _GLOBAL.id, project: _GLOBAL.project});
+			});
+			//RECEIVE
+			socket.on("get_msg", function(data) {
+				alert(data.project + "에 변경사항!" + "\n" + data.id + "님이 push하셨습니다.");
+				$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
+					console.log("/makeGitTree complete");
+					$("#git_tree_container").empty();
+					$("#git_tree_container").append(data);
+				});
+			}); 
 	
 
 
@@ -747,6 +770,9 @@ $(document).ready(function() {
 			{
 				console.log("push successful.", data.reason);
 				alert("성공적으로 push 했습니다.");
+
+				alert(data.project + "에 변경사항!" + "\n" + data.id + "님이 push하셨습니다.");
+				
 				//gitTree draw
 				$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
 					console.log("/makeGitTree complete");
