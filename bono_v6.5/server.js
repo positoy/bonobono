@@ -268,6 +268,25 @@ app.get('/makeGitTree', function(req, res){
 	console.log("/makeGitTree : " +path + " / " +id);
 	gitTree.logTree(path, id, draw_handler, res); 
 });
+//export
+app.get('/btm_menu_export', function(request, response){
+
+	var context = "[/btm_menu_export] : ";
+
+	console.log(context, "connected");
+
+	var user_id = request.param("id");
+	var project_name = request.param("project");
+
+	var path = "./user_data/projects/" + project_name + "/_" + user_id + "/bin/"+project_name+"-release.apk";
+
+	console.log(_GLOBAL.cur_project_target);
+	console.log(path);
+
+	response.download(path);
+
+	
+});
 
 //child : run
 app.get('/btm_menu_run', function(request, response){

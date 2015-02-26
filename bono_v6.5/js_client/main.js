@@ -253,7 +253,17 @@ $(document).ready(function() {
 			alert(data);
 		});
 	});
+	///////////////
+	$("#btm_menu_export").click(function(){
+		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
+			isShownBtmMenu = false;
+		$.get("/btm_menu_export?id=" + _GLOBAL.id + "&project=" + _GLOBAL.project, function(data, status){
 
+			//alert(data);
+		});
+	});
+
+	///////////////
 	$("#dialog_select_project_proj").scroll();
 
 	$("#dialog_select_project_proj").on("click", "a", function(){
