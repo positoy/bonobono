@@ -5,6 +5,7 @@ var path = require('path');
 var db = require('./db.js')();
 var git = require('./git.js');
 var gitTree = require('./git_log.js')();
+var importclass=require('./imports.js')();
 
 // express 4.0
 var express = require('express');
@@ -541,9 +542,12 @@ app.post('/file_save', function(req, res){
 	console.log(path);
 
 	var antcompile = exec("cd " + path +"; "+ " ant compile", function(err, stdout ,stderr){
-		//console.log(stdout);
-		var task1index=stdout.search("task1");//not java error
-		
+		console.log(stdout);
+			
+      	
+
+
+
 			if (err === null)
 			{
 				console.log( "compile successful");
@@ -551,7 +555,9 @@ app.post('/file_save', function(req, res){
 			
 			}
 			else
-			{
+			{	
+				var task1index=stdout.search("task1");//not java error
+				
 				if(task1index!==-1){
 					var start = stdout.search("part!");
 					stdout = stdout.substring(start+6,stdout.length);
@@ -561,8 +567,7 @@ app.post('/file_save', function(req, res){
 					var _LOG = stdout.split("[javac] ");
 					var _ParseLog="";
 					var k=0;
-
-
+		
 					if(_LOG.length>1){
 							_ParseLog+=(  "statments : " + _LOG[3] +"\n");
 							var _tmp = _LOG[2].split(":");
@@ -571,17 +576,32 @@ app.post('/file_save', function(req, res){
 							var symbolindex = _tmp[3].search("symbol");
 							
 							if(symbolindex!==-1){
-									_LOG[5] = _LOG[5].replace("symbol:","import");
-									_ParseLog += ("   --->   " + _LOG[5] + "\n");
+									////////////////////////////////
+									_LOG[5] = _LOG[5].split(" ");
+
 									i++; 
-							
 
+									//////////////////////////////////////
+									_LOG[5][2] = "."+_LOG[5][2];
+									for(var c=0;c<importclass.length;c++){
+										if(importclass[c].label.search(_LOG[5][2])!=-1){
+											var tmp_Label = importclass[c].label.split(".");
+											_LOG[5][2] = _LOG[5][2].replace(".","");
+											if(tmp_Label[tmp_Label.length-1]===_LOG[5][2]){
+												//console.log(importclass[c].label);
+												_ParseLog += ("   --->   import " + importclass[c].label + "\n");
+												break;	
+											}
+										}
+									}
+									//////////////////////////////////////
+	
 
-							_ParseLog += ("   line   : " + _tmp[1] + "\n");
-							var index = _tmp[0].search(user_id);
-							_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
-							_ParseLog += (" location : " + _tmp[0] + "\n\n");
-							
+									_ParseLog += ("   line   : " + _tmp[1] + "\n");
+									var index = _tmp[0].search(user_id);
+									_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
+									_ParseLog += (" location : " + _tmp[0] + "\n\n");
+								
 								for(var i = 7;i<_LOG.length;i++){
 								//	console.log("_LOG["+i+"] = " + _LOG[i]);
 									if((i)%5===3){
@@ -594,11 +614,26 @@ app.post('/file_save', function(req, res){
 
 										if(symbolindex!==-1){
 											i+=2;
-											_LOG[i] = _LOG[i].replace("symbol:","import");
-											_ParseLog += ("   --->   " + _LOG[i] + "\n");
+											_LOG[i] = _LOG[i].split(" ");
+
+
+											//////////////////////////////////////
+											_LOG[i][2] = "."+_LOG[i][2];
+											for(var c=0;c<importclass.length;c++){
+												if(importclass[c].label.search(_LOG[i][2])!=-1){
+													var tmp_Label = importclass[c].label.split(".");
+													_LOG[i][2] = _LOG[i][2].replace(".","");
+													if(tmp_Label[tmp_Label.length-1]===_LOG[i][2]){
+														//console.log(importclass[c].label);
+														_ParseLog += ("   --->   import " + importclass[c].label + "\n");
+														break;	
+													}
+												}
+											}
+											//////////////////////////////////////
 											i++; 
 										}
-										_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
+										_ParseLog += ("   line   : " + _tmp[1] + "\n");
 										var index = _tmp[0].search(user_id);
 										_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
 										_ParseLog += (" location : " + _tmp[0] + "\n\n");
@@ -608,7 +643,7 @@ app.post('/file_save', function(req, res){
 								}
 							}
 							else{
-							
+
 								_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
 								var index = _tmp[0].search(user_id);
 								_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
@@ -639,6 +674,18 @@ app.post('/file_save', function(req, res){
 					//res.send(stderr);
 			}
 			else{
+
+				if(stdout.search("task3"===-1)){//androidmanifext.xml error
+					stdout = stdout.replace(/(\r\n|\r|\n|\^)/gm,"");
+					stdout = stdout.replace(/(\s{2,})/g,' ');	
+					var _tmp = stdout.split("[gettarget] ");
+					console.log(_tmp[3]);
+					_tmp[3] = _tmp[3].split(":");
+					console.log("Compile ERROR     :    AndroidManifest.xml Error\n");
+					console.log("statments : " + _tmp[3][3]);
+					console.log("   line   : " + _tmp[3][1] + "\n");
+				}
+				else{
 				var start = stdout.search("[task3]");
 				stdout = stdout.substring(start,stdout.length);
 				console.log(stdout);
@@ -659,7 +706,7 @@ app.post('/file_save', function(req, res){
 					
 				_ParseLog = "Compile ERROR     :    Not .java error\n\n"+_ParseLog;
 				console.log(_ParseLog);			
-			
+				}
 			}
 		}
 	});
