@@ -1071,7 +1071,7 @@ io.on('connection', function(socket){
 				console.log("/////////////////socket data check///////////////////////");			
 				console.log(data.id, data.project);
 
-				io.in(socket.p_name).emit("push_response",null);
+				io.in(socket.p_name).emit("push_response",data);
 				//socket.emit("push_response", data);
 			}
 
