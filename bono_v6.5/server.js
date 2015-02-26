@@ -20,6 +20,7 @@ var filetree = require('./lib/jqueryFileTree_srv.js');
 var sys = require('sys');
 var exec  = require('child_process').exec;
 var app = express();
+var EasyZip = require('easy-zip').EasyZip;
 
 
 // sessoin
@@ -278,15 +279,46 @@ app.get('/btm_menu_export', function(request, response){
 	var user_id = request.param("id");
 	var project_name = request.param("project");
 
-	var path = "./user_data/projects/" + project_name + "/_" + user_id + "/bin/"+project_name+"-release.apk";
-
+	var path = './user_data/projects/' + project_name + '/_' + user_id;
+	
 	console.log(_GLOBAL.cur_project_target);
 	console.log(path);
+	
+	var child = exec("cd " + path +"; "+ " zip -r ../"+user_id+".zip ./*", function(err, stdout ,stderr){
+ 		if (err === null)
+		{
+			console.log(context, "	successful");
+			response.download('./user_data/projects/' + project_name +'/' +user_id+'.zip');
+		}
+		else
+		{
+			console.log(context, "error");
+			sys.print('stderr : ' + stderr);
+			//response.download);
+		}
+	});
 
-	response.download(path);
 
 	
 });
+//import
+app.get('/btm_menu_import', function(request, response){
+
+	var context = "[/btm_menu_import] : ";
+
+	console.log(context, "connected");
+
+	var user_id = request.param("id");
+	var project_name = request.param("project");
+	console.log(_GLOBAL.cur_project_target);
+	console.log(path);
+
+	
+
+
+});
+
+
 
 //child : run
 app.get('/btm_menu_run', function(request, response){
@@ -302,6 +334,9 @@ app.get('/btm_menu_run', function(request, response){
 
 	console.log(_GLOBAL.cur_project_target);
 	console.log(path);
+
+
+
 	fs.readFile(path+"/test.keystore", 'utf8', function(err, data) {
   		if(err){
   			var cmd = "cp ./user_data/build/test.keystore " + path+"/test.keystore";
@@ -342,16 +377,18 @@ app.get('/btm_menu_run', function(request, response){
 			});
   		}
   	});
+		var path1 = "./user_data/projects/" + project_name + "/_" + user_id + "/bin/"+project_name+"-release.apk";
 
 
 	// 빌드 끝내고 apk 파일도 전송해 줘야함.
 	var child = exec("cd " + path +"; "+ " ant clean release", function(err, stdout ,stderr){
-
 		if (err === null)
 		{
 			console.log(context, "	successful");
-			sys.print('stdout : '+ stdout);
-			response.send(stdout);
+			//sys.print('stdout : '+ stdout);
+			//response.send(stdout);
+		response.download(path1);
+
 		}
 		else
 		{
