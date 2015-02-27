@@ -915,11 +915,6 @@ io.on('connection', function(socket) {
 
 	});
 
-	socket.on("out", function(data) {
-		socket.leave();
-
-	});
-
 
 	socket.on("push_msg", function(data) {
 		console.log("/////////////////socket data check///////////////////////");			
