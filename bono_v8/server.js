@@ -441,6 +441,10 @@ app.get('/updatetarget', function(req, res){
 	fs.readFile(_GLOBAL.cur_project_path+"project.properties", 'utf8', function(err, data) {
 		
 		console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!@@@@@@@@@@@@@@@@@@ : " +data);
+ 		if(data===null){
+ 			res.send("no project , please create project!")
+
+ 		}
  		var n = data.search("target=");
 
 		var resTarget = data.substring(n+7,data.length-1);
