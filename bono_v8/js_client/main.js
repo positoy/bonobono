@@ -11,7 +11,6 @@ var fileTreePath = "";
 
 var tttt = 0;
 
-
 // **************************** 2.26 ****************************
 var __filePath;
 var pupup_time = 2000;
@@ -174,7 +173,6 @@ $(document).ready(function() {
 		}
 	});
 	
-
 
 	$("#right_topbar_sortable").on("click", "li", function(e){
 
@@ -547,7 +545,30 @@ $(document).ready(function() {
 			});
 
 			$("#form_id").val(_GLOBAL.id);
+			$("#form_inv_project").val(_GLOBAL.project);
+			
 
+		}else if(menu == "Invitation List"){
+			$("#dialog_invitelist").dialog({
+				dialogClass : "bottom_dialog",
+				modal : true,
+				resizable : false,
+				width : 360,
+				height : 460,
+				show : {
+					effect : "fade",
+					duration : 500
+				},
+				hide : {
+					effect : "fade",
+					duration : 500
+				},
+				beforeClose : function() {
+				}
+			});
+		
+			socket.emit("invitelist_request", _GLOBAL.id);	
+			
 		}else if(menu == "Logout"){
 			var res = confirm("Logout?");
 			if(res){
@@ -646,9 +667,40 @@ $(document).ready(function() {
 					alert("Please Chk Id / Pwd");
 				}
 			});
+			
+			$("#dialog_invite").dialog("close");
+			
+			$("#form_inv_id").val("");
+			$("#form_inv_msg").val("");
+			
 		} else {
 			alert("Please Chk Id / Pwd");
 		}
+	});
+
+	//////////////////////
+	// BTN ACCEPT
+	/////////////////////
+	$("#btn_accept").click(function() {
+
+		var content = $(".invitem.selected").html();
+		var project_name = content.substr(content.search(':') + 1).trim().split('<br>')[0];
+		
+		console.log("[invitelist_accept request] : ", _GLOBAL.id, project_name);		
+		socket.emit("invitelist_accept", {id:_GLOBAL.id, project:project_name});
+	});
+
+	//////////////////////
+	// BTN DECLINE
+	/////////////////////
+	$("#btn_decline").click(function() {
+
+	console.log("btn_decline");
+		var content = $(".invitem.selected").html();
+		var project_name = content.substr(content.search(':') + 1).trim().split('<br>')[0];
+		
+		console.log("[invitelist_decline request] : ", _GLOBAL.id, project_name);		
+		socket.emit("invitelist_decline", {id:_GLOBAL.id, project:project_name});
 	});
 	
 	// git Tree client script...2015.2.24 cwlsn88
@@ -731,28 +783,36 @@ $(document).ready(function() {
  
 
 
-			//*************************//
-		    // Enter the room 
-		    //*************************//
-		    //SEND
-			$("#btm_menu_subtract").click(function(){
-				socket.emit("push_msg", {id: _GLOBAL.id, project: _GLOBAL.project});
+		//////////////////////////////////
+		// Enter the room 
+		//////////////////////////////////
+
+
+		//SEND
+		$("#btm_menu_subtract").click(function(){
+			socket.emit("push_msg", {id: _GLOBAL.id, project: _GLOBAL.project});
+		});
+
+
+		//RECEIVE
+		socket.on("get_msg", function(data) {
+			alert(data.project + "에 변경사항!" + "\n" + data.id + "님이 push하셨습니다.");
+			$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
+				console.log("/makeGitTree complete");
+				$("#git_tree_container").empty();
+				$("#git_tree_container").append(data);
 			});
-			//RECEIVE
-			socket.on("get_msg", function(data) {
-				alert(data.project + "에 변경사항!" + "\n" + data.id + "님이 push하셨습니다.");
-				$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
-					console.log("/makeGitTree complete");
-					$("#git_tree_container").empty();
-					$("#git_tree_container").append(data);
-				});
-			}); 
+		}); 
 	
 
-
-		/////////////////
-		// RECEIVE
-		/////////////////
+	////////////////////////////////////
+	////////////////////////////////////
+	// RECEIVE
+	////////////////////////////////////
+	////////////////////////////////////
+	
+	
+	
 		socket.on("pull_response", function(data) {
 
 			console.log(data);
