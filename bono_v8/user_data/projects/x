@@ -36,15 +36,10 @@ $(document).ready(function() {
 	var prv_contents;
 	var file_cnt = 0;
 	var socket = io();
-	
-	
-
 
 	// *********************************** 2.26 ****************************
 	// flag : is selected fileTree or top bar?
-	// *********************************** 2.26 ****************************
-	// flag : is selected fileTree or top bar?
-	function make_editor(data, file, flag, _working_flag){
+	function make_editor(data, file, flag){
 		$("#right_editor").children().remove();
 		$("#right_editor").append("<div id='right_editor_inner' style='top:63px;'></div>");
 		editor = null;
@@ -61,14 +56,6 @@ $(document).ready(function() {
 		editor.setShowPrintMargin(false);
 		editor.getSession().setMode("ace/mode/java");
 		//document.getElementById("right_editor_inner").style.fontSize = "15px";
-
-		//_working_flag설정
-		if(_working_flag === 1) {
-			editor.setReadOnly(true);
-		} else {
-			editor.setReadOnly(false);
-		}
-
 
 		editor.commands.addCommand({
 			name : 'save',
@@ -93,14 +80,12 @@ $(document).ready(function() {
 					 	project : _GLOBAL.project,
 						fileName : file,
 						contents : editor.getValue()
-					}, function(data,status) {
+					}, function() {
 						$("#mini_popup_text").text("Save Complete");
 						$("#mini_popup").fadeIn("slow", function() {
 							setTimeout(function() {
 								$("#mini_popup").fadeOut("slow");
 							}, pupup_time);
-						$("#right_log_inner").append(data);
-
 						}); 
 					});
 				}
@@ -151,8 +136,7 @@ $(document).ready(function() {
 		$('#left_tree').fileTree({root : folder_path, script : 'req_filetree'}, function(file) {
 			// When file opening...send data to server with 'post'
 			$.post('openFile', {path : file}, function(data) {
-					make_editor(data, file, 1, 1);
-					//파일트리에서 열면: read-only
+					make_editor(data, file, 1);
 				});
 		});
 	}
@@ -187,53 +171,18 @@ $(document).ready(function() {
 		//var fullPath = tree_root.concat(temp);
 		var file_path = $(e.target).children("a").attr("data-path");
 
-		//지금 선택된 파일이 수정해도 되는 건지 아닌지 확인하라고 시킨다.
-		socket.emit("work_sync",{project: _GLOBAL.project, id:_GLOBAL.id, file: file_path});
+		var pre_sel = $("#right_topbar_sortable").children(".file_selected");
+		$(pre_sel).removeClass("file_selected");
+		$(pre_sel).addClass("file_notSelected");
 
+		$(e.target).removeClass("file_notSelected");
+		$(e.target).addClass("file_selected");
 
-		socket.on("work_sync_response", function(_work_flag) {
-
-			console.log("_work_flag:::: " + _work_flag);
-			console.log("work_sync_response", "arrived");
-
-			$.post('openFile', {path : file_path}, function(data){
-				if(data != "&*^nothing"){
-					
-					var pre_sel = $("#right_topbar_sortable").children(".file_selected");
-					$(pre_sel).removeClass("file_selected");
-					$(pre_sel).addClass("file_notSelected");
-
-					$(e.target).removeClass("file_notSelected");
-					$(e.target).addClass("file_selected");
-
-					make_editor(data, file_path, 0, _work_flag);
-
-				}
-			});
-			editor.$blockScrolling = Infinity;
-			socket.removeListener("work_sync_response");
-
+		$.post('openFile', {path : file_path}, function(data){
+			if(data != "&*^nothing"){
+				make_editor(data, file_path, 0);	
+			}
 		});
-
-
-
-
-
-		// var pre_sel = $("#right_topbar_sortable").children(".file_selected");
-		// $(pre_sel).removeClass("file_selected");
-		// $(pre_sel).addClass("file_notSelected");
-
-		// $(e.target).removeClass("file_notSelected");
-		// $(e.target).addClass("file_selected");
-
-		// $.post('openFile', {path : file_path}, function(data){
-		// 	if(data != "&*^nothing"){
-		// 		make_editor(data, file_path, 0);	
-		// 	}
-		// });
-	
-
-
 	});
 	
 	// **************************** 2.26 ****************************
@@ -490,7 +439,6 @@ $(document).ready(function() {
 
 	// *********************************** 2.26 ****************************
 
-
 	$("#personal_info > img").click(function() {
 		if (isPerInfoVisible) {
 			isPerInfoVisible = false;
@@ -699,25 +647,6 @@ $(document).ready(function() {
 	$("#git_tree_container").on("mouseleave", "div", function(e) {
 		$("#git_tree_window").css("visibility", "hidden");
 	}); 
-	
-	
-	
-	
-	
-	
-	
-	
-	// ************************* LOG ***********************************
-	// ************************* LOG ***********************************
-	// ************************* LOG ***********************************
-
-	
-	// ************************* LOG ***********************************
-	// ************************* LOG ***********************************
-	// ************************* LOG ***********************************
-
-
-
 
 	////////////////////////////////////////////////////////
 	//	SOCKET.IO
@@ -755,19 +684,16 @@ $(document).ready(function() {
 			socket.emit("pull", {id: _GLOBAL.id, project: _GLOBAL.project});
 			}
 		}); 
+ 
 
 
 		//////////////////////////////////
 		// Enter the room 
 		//////////////////////////////////
-
-
 		//SEND
 		$("#btm_menu_subtract").click(function(){
 			socket.emit("push_msg", {id: _GLOBAL.id, project: _GLOBAL.project});
 		});
-
-
 		//RECEIVE
 		socket.on("get_msg", function(data) {
 			alert(data.project + "에 변경사항!" + "\n" + data.id + "님이 push하셨습니다.");
@@ -906,16 +832,16 @@ $(document).ready(function() {
 				var item = $("<li>").html(content).addClass("invitem");
 				
 				$("#invitation_list").append(item);
-				
-				$(".invitem").click(function(){
-					console.log("invitem click");				
-					$(".invitem").removeClass("selected");
-					$(this).addClass("selected");
-				});	
-	
 			}
+			
+			$(".invitem").click(function(){
+				
+				$(".invitem").removeClass("selected");
+				$(this).addClass("selected");
+			})
 		}
 	});
+		
 		
 	///////////////////////////////////
 	//	INVITE ACCEPT RESPONSE
@@ -951,6 +877,7 @@ $(document).ready(function() {
 			$("#invitation_list").children(".selected").remove();
 		}
 	});
-	
-	
+		
+		
+			
 });

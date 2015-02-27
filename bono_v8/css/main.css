@@ -218,6 +218,22 @@ html, body {
 
 /* Dialog Box */
 
+#invitation_list {
+	list-style-type: none;
+	margin: 0px;
+}
+
+.invitem {
+	color: white;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	
+}
+
+.invitem.selected {
+	color: red;
+}
+
 .bottom_dialog {
 	font-family: 'Montserrat', sans-serif !important;
 	width: 100%;
