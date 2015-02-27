@@ -489,6 +489,8 @@ app.get('/updatetarget', function(req, res){
  **********/
 
 app.get('/logout', function(req, res){
+
+
 	delete req.session.user_id;
 	res.send("logout");
 });
@@ -913,6 +915,12 @@ io.on('connection', function(socket) {
 
 	});
 
+	socket.on("out", function(data) {
+		socket.leave();
+
+	});
+
+
 	socket.on("push_msg", function(data) {
 		console.log("/////////////////socket data check///////////////////////");			
 		console.log(data.id);
@@ -1100,17 +1108,21 @@ io.on('connection', function(socket) {
 	///////////////////
 	// PUSH
 	///////////////////
-	socket.on('push', function(data) {
+	socket.on('push', function(_data) {
 
-		if ( typeof data.project === "undefined") {
-			socket.emit("push_response", null);
+		if ( typeof _data.project === "undefined") {
+			//socket.emit("push_response", null);
+			io.in(socket.p_name).emit("push_response",null);
 			return;
 		}
 
-		function push_handler(push_successful, socket, msg) {
+		function push_handler(push_successful, socket, msg) 
+		{
 			var socket = socket;
 			var data = {};
 
+			data.id = _data.id;
+			data.project = _data.project;
 			data.reason = msg;
 
 			if (push_successful === true)
@@ -1118,11 +1130,15 @@ io.on('connection', function(socket) {
 			else
 				data.result = "fail";
 
-			socket.emit("push_response", data);
+			console.log("/////////////////socket data check///////////////////////");			
+			console.log(data.id, data.project);
+
+			io.in(socket.p_name).emit("push_response",data);
+			//socket.emit("push_response", data);
 		}
 
 
-		git.push(data.project, data.id, push_handler, socket);
+		git.push(_data.project, _data.id, push_handler, socket);
 	});
 
 	/////////////////////////
