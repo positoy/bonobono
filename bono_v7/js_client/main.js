@@ -300,14 +300,13 @@ $(document).ready(function() {
 		isShownBtmMenu = false;
 		window.location = "/btm_menu_export?id=" + _GLOBAL.id + "&project=" + _GLOBAL.project;
 	});
-	$("#btm_menu_import").click(function(){
-		console.log("in!");
-		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
-		isShownBtmMenu = false;
-		window.location = "/btm_menu_import?id=" + _GLOBAL.id + "&project=" + _GLOBAL.project;
+//$("#btm_menu_import").click(function(){
+//		console.log("in!");
+//		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
+//		isShownBtmMenu = false;
 
-	});	
-
+//		window.location = "/btm_menu_import?id=" + _GLOBAL.id + "&project=" + _GLOBAL.project;
+//	});	
 	///////////////
 	$("#dialog_select_project_proj").scroll();
 

@@ -52,6 +52,7 @@ app.use(serve_static(__dirname));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.Router());
 
+
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
@@ -310,12 +311,11 @@ app.get('/btm_menu_import', function(request, response){
 
 	var user_id = request.param("id");
 	var project_name = request.param("project");
+
+//	var path = "./user_data/projects/" + project_name + "/_" + user_id + "/bin/"+project_name+"-release.apk";
+//response.download(path);
 	console.log(_GLOBAL.cur_project_target);
 	console.log(path);
-
-	
-
-
 });
 
 
@@ -334,9 +334,6 @@ app.get('/btm_menu_run', function(request, response){
 
 	console.log(_GLOBAL.cur_project_target);
 	console.log(path);
-
-
-
 	fs.readFile(path+"/test.keystore", 'utf8', function(err, data) {
   		if(err){
   			var cmd = "cp ./user_data/build/test.keystore " + path+"/test.keystore";
@@ -377,7 +374,6 @@ app.get('/btm_menu_run', function(request, response){
 			});
   		}
   	});
-		var path1 = "./user_data/projects/" + project_name + "/_" + user_id + "/bin/"+project_name+"-release.apk";
 
 
 	// 빌드 끝내고 apk 파일도 전송해 줘야함.
@@ -385,10 +381,8 @@ app.get('/btm_menu_run', function(request, response){
 		if (err === null)
 		{
 			console.log(context, "	successful");
-			//sys.print('stdout : '+ stdout);
-			//response.send(stdout);
-		response.download(path1);
-
+			sys.print('stdout : '+ stdout);
+			response.send(stdout);
 		}
 		else
 		{
@@ -906,7 +900,6 @@ io.of('/project_invitelist')
 });
 */
 
-
 /*********************
   EDITOR CONTEXT
  *********************/
@@ -998,24 +991,7 @@ io.on('connection', function(socket){
 		}); 
 		
 		// ****************************************************** 2.26
- 		
 
- 		//*************************//
-		// Enter the room 
-		//*************************//
-		socket.on("in", function(room_data) {
-			socket.join(room_data);
-			socket.p_name = room_data;
-			console.log("/////////////////socket room check///////////////////////");
-			console.log("User " + socket.handshake.address + " in at : " + socket.p_name);
-		});
-
-
-		socket.on("push_msg", function(data) {
-			console.log("/////////////////socket data check///////////////////////");			
-			console.log(data.id);
-			io.in(socket.p_name).emit("get_msg", data);
-		});
 
 
 		///////////////////
@@ -1080,12 +1056,11 @@ io.on('connection', function(socket){
 		///////////////////
 		// PUSH
 		///////////////////
-		socket.on('push',function(_data){
+		socket.on('push',function(data){
 
-			if (typeof _data.project === "undefined")
+			if (typeof data.project === "undefined")
 			{
-				//socket.emit("push_response", null);
-				io.in(socket.p_name).emit("push_response",null);
+				socket.emit("push_response", null);
 				return;
 			}
 
@@ -1095,24 +1070,17 @@ io.on('connection', function(socket){
 				var socket = socket;
 				var data = {};
 
-				data.id = _data.id;
-				data.project = _data.project;
 				data.reason = msg;
 
 				if (push_successful === true)
 					data.result = "successful";
 				else
 					data.result = "fail";
-				
 
-				console.log("/////////////////socket data check///////////////////////");			
-				console.log(data.id, data.project);
-
-				io.in(socket.p_name).emit("push_response",data);
-				//socket.emit("push_response", data);
+				socket.emit("push_response", data);
 			}
 
-			git.push(_data.project, _data.id, push_handler, socket);
+			git.push(data.project, data.id, push_handler, socket);
 		});
 
 });

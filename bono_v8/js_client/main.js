@@ -39,6 +39,8 @@ $(document).ready(function() {
 
 	// *********************************** 2.26 ****************************
 	// flag : is selected fileTree or top bar?
+	// *********************************** 2.26 ****************************
+	// flag : is selected fileTree or top bar?
 	function make_editor(data, file, flag, _working_flag){
 		$("#right_editor").children().remove();
 		$("#right_editor").append("<div id='right_editor_inner' style='top:63px;'></div>");
@@ -88,12 +90,14 @@ $(document).ready(function() {
 					 	project : _GLOBAL.project,
 						fileName : file,
 						contents : editor.getValue()
-					}, function() {
+					}, function(data,status) {
 						$("#mini_popup_text").text("Save Complete");
 						$("#mini_popup").fadeIn("slow", function() {
 							setTimeout(function() {
 								$("#mini_popup").fadeOut("slow");
 							}, pupup_time);
+						$("#right_log_inner").append(data);
+
 						}); 
 					});
 				}
@@ -731,7 +735,6 @@ $(document).ready(function() {
 	// ************************* LOG ***********************************
 	// ************************* LOG ***********************************
 
-	$("#right_log_inner").text("여기다 로그 내용 넣으면 됍니다요.");
 	
 	// ************************* LOG ***********************************
 	// ************************* LOG ***********************************

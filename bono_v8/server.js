@@ -627,17 +627,23 @@ app.post('/file_save', function(req, res){
 	console.log(path);
 
 	var antcompile = exec("cd " + path +"; "+ " ant compile", function(err, stdout ,stderr){
-		console.log(stdout);  	
+		console.log(stdout);
+			
+      	
+
 
 
 			if (err === null)
 			{
-				console.log( "compile successful");
+				console.log( "compile successful</br><br/>");
 				sys.print('stdout : '+ stdout);
-			
+				res.send("Compile Success!!!!!");
 			}
 			else
 			{	
+				if(stdout===null){
+					reponse.send("not compile , create project");
+				}
 				var task1index=stdout.search("task1");//not java error
 				
 				if(task1index!==-1){
@@ -651,13 +657,14 @@ app.post('/file_save', function(req, res){
 					var k=0;
 		
 					if(_LOG.length>1){
-							_ParseLog+=(  "statments : " + _LOG[3] +"\n");
+							_ParseLog+=(  "statments &nbsp;:&nbsp; " + _LOG[3] +"</br>");
 							var _tmp = _LOG[2].split(":");
-							_ParseLog += ("  state   :" + _tmp[3]);
+							_ParseLog += ("  state  &nbsp;&nbsp;&nbsp;&nbsp;  :&nbsp;" + _tmp[3]);
 							
-							var symbolindex = _tmp[3].search("symbol");
-							
-							if(symbolindex!==-1){
+							if(_tmp[3]===null){response.send("not compile, create project");}
+							var symbolindex = _tmp[3].search("symbol");		//java file error check
+											
+							if(symbolindex!==-1){					//java file error
 									////////////////////////////////
 									_LOG[5] = _LOG[5].split(" ");
 
@@ -671,7 +678,7 @@ app.post('/file_save', function(req, res){
 											_LOG[5][2] = _LOG[5][2].replace(".","");
 											if(tmp_Label[tmp_Label.length-1]===_LOG[5][2]){
 												//console.log(importclass[c].label);
-												_ParseLog += ("   --->   import " + importclass[c].label + "\n");
+												_ParseLog += ("   --->   import " + importclass[c].label + "</br>");
 												break;	
 											}
 										}
@@ -679,17 +686,17 @@ app.post('/file_save', function(req, res){
 									//////////////////////////////////////
 	
 
-									_ParseLog += ("   line   : " + _tmp[1] + "\n");
+									_ParseLog += ("   line   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp; " + _tmp[1] + "</br>");
 									var index = _tmp[0].search(user_id);
 									_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
-									_ParseLog += (" location : " + _tmp[0] + "\n\n");
+									_ParseLog += (" location &nbsp;&nbsp;:&nbsp; " + _tmp[0] + "</br></br>");
 								
 								for(var i = 7;i<_LOG.length;i++){
 								//	console.log("_LOG["+i+"] = " + _LOG[i]);
 									if((i)%5===3){
-										_ParseLog+=(  "statments : " + _LOG[i] +"\n");
+										_ParseLog+=(  "statments &nbsp;:&nbsp; " + _LOG[i] +"</br>");
 										var _tmp = _LOG[i-1].split(":");
-										_ParseLog += ("  state   :" + _tmp[3]);
+										_ParseLog += ("  state  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;  " + _tmp[3]);
 										if(_tmp[3] == null){break;}
 										var symbolindex = _tmp[3].search("symbol");
 							
@@ -707,41 +714,40 @@ app.post('/file_save', function(req, res){
 													_LOG[i][2] = _LOG[i][2].replace(".","");
 													if(tmp_Label[tmp_Label.length-1]===_LOG[i][2]){
 														//console.log(importclass[c].label);
-														_ParseLog += ("   --->   import " + importclass[c].label + "\n");
+														_ParseLog += ("   --->   import " + importclass[c].label + "</br>");
 														break;	
 													}
 												}
 											}
-											//////////////////////////////////////
+										
 											i++; 
 										}
-										_ParseLog += ("   line   : " + _tmp[1] + "\n");
+										_ParseLog += ("   line   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp; " + _tmp[1] + "</br>");
 										var index = _tmp[0].search(user_id);
 										_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
-										_ParseLog += (" location : " + _tmp[0] + "\n\n");
+										_ParseLog += (" location &nbsp;&nbsp;:&nbsp; " + _tmp[0] + "</br></br>");
 									}
-								//	console.log(_ParseLog);
-						
+							
 								}
 							}
-							else{
+							else{//layout error
 
-								_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
+								_ParseLog += ("</br>   line   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp; " + _tmp[1] + "</br>");
 								var index = _tmp[0].search(user_id);
 								_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
-								_ParseLog += (" location : " + _tmp[0] + "\n\n");
+								_ParseLog += (" location &nbsp;&nbsp;:&nbsp; " + _tmp[0] + "</br></br>");
 							
 
 								for(var i=4;i<_LOG.length;i++){
 								//	console.log("_LOG["+i+"] = " + _LOG[i]);
 									if((i)%3===0){
-										_ParseLog+=(  "statments : " + _LOG[i] +"\n");
+										_ParseLog+=(  "statments &nbsp;:&nbsp; " + _LOG[i] +"</br>");
 										var _tmp = _LOG[i-1].split(":");
-										_ParseLog += ("  state   :" + _tmp[3]);
-										_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
+										_ParseLog += ("  state &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;" + _tmp[3]);
+										_ParseLog += ("</br>   line   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp; " + _tmp[1] + "</br>");
 										var index = _tmp[0].search(user_id);
 										_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
-										_ParseLog += (" location : " + _tmp[0] + "\n\n");
+										_ParseLog += (" location &nbsp;&nbsp;:&nbsp; " + _tmp[0] + "</br></br>");
 									}
 								//	console.log(_ParseLog);
 								}
@@ -749,11 +755,9 @@ app.post('/file_save', function(req, res){
 					}
 		
 
-					_ParseLog = "Compile ERROR     :    "+ _LOG[_LOG.length-1] +"\n\n"+_ParseLog;
-					console.log(_ParseLog);			
-			
-					//sys.print(stdout);
-					//res.send(stderr);
+					_ParseLog = "Compile ERROR     :    "+ _LOG[_LOG.length-1] +"</br></br>"+_ParseLog+"</br></br>";
+				
+					res.send(_ParseLog);
 			}
 			else{
 
@@ -761,40 +765,43 @@ app.post('/file_save', function(req, res){
 					stdout = stdout.replace(/(\r\n|\r|\n|\^)/gm,"");
 					stdout = stdout.replace(/(\s{2,})/g,' ');	
 					var _tmp = stdout.split("[gettarget] ");
+
 					console.log(_tmp[3]);
 					_tmp[3] = _tmp[3].split(":");
-					console.log("Compile ERROR     :    AndroidManifest.xml Error\n");
-					console.log("statments : " + _tmp[3][3]);
-					console.log("   line   : " + _tmp[3][1] + "\n");
+					var _ParseLog="";
+					_ParseLog+="Compile ERROR &nbsp; &nbsp; : &nbsp; &nbsp; AndroidManifest.xml Error<br/><br/>";
+					_ParseLog+=("statments &nbsp;:&nbsp; " + _tmp[3][3]+"<br/>");
+					_ParseLog+=("   line   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp; " + _tmp[3][1] + "<br/><br/>");
+					//res.send(_ParseLog);
 				}
 				else{
-				var start = stdout.search("[task3]");
-				stdout = stdout.substring(start,stdout.length);
-				console.log(stdout);
-				
-				stdout = stdout.replace(/(\r\n|\r|\n|\^)/gm,"");
-				stdout = stdout.replace(/(\s{2,})/g,' ');	
-				var _LOG = stdout.split("[aapt] ");
-				var _ParseLog="";
-				var _tmp=_LOG[_LOG.length-2].split(":");
-
-
-				_ParseLog+=(  "statments :" + _tmp[3] +"\n");
-				_ParseLog += ("  state   :" + _tmp[4]);
-				_ParseLog += ("\n   line   : " + _tmp[1] + "\n");
-				var index = _tmp[0].search(user_id);
-				_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
-				_ParseLog += (" location : " + _tmp[0] + "\n\n");
+					var start = stdout.search("[task3]");
+					stdout = stdout.substring(start,stdout.length);
+					console.log(stdout);
 					
-				_ParseLog = "Compile ERROR     :    Not .java error\n\n"+_ParseLog;
-				console.log(_ParseLog);			
+					stdout = stdout.replace(/(\r\n|\r|\n|\^)/gm,"");
+					stdout = stdout.replace(/(\s{2,})/g,' ');	
+					var _LOG = stdout.split("[aapt] ");
+					var _ParseLog="";
+					var _tmp=_LOG[_LOG.length-2].split(":");
+
+
+					_ParseLog+=(  "statments &nbsp;:&nbsp;" + _tmp[3] +"</br>");
+					_ParseLog += ("  state  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;  " + _tmp[4]);
+					_ParseLog += ("</br>   line   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp; " + _tmp[1] + "</br>");
+					var index = _tmp[0].search(user_id);
+					_tmp[0] = _tmp[0].substring(_tmp[0].search('_'+user_id)+user_id.length+1,_tmp[0].length);
+					_ParseLog += (" location &nbsp;&nbsp;:&nbsp; " + _tmp[0] + "</br></br>");
+						
+					_ParseLog = "Compile ERROR     :    Not .java error</br></br>"+_ParseLog+"</br></br>";
+					console.log(_ParseLog);			
 				}
+				res.send(_ParseLog);
 			}
 		}
 	});
-	res.sendStatus(200);
+	//res.send(_ParseLog);
 });
-
 /*********************
  EDITOR - FILE TREE
 **********************/

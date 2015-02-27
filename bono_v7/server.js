@@ -391,6 +391,9 @@ app.get('/btm_menu_run', function(request, response){
 	var filecontent;
 	var key_none;
 	//local.properties update
+		var filecontent;
+	var key_none;
+	//local.properties update
 	fs.readFile(path+"/local.properties", 'utf8', function(err, fd) {
 		console.log(path+"/local.properties");
 		//console.log("read success\n"+fd);
@@ -408,7 +411,6 @@ app.get('/btm_menu_run', function(request, response){
 			});
   		}
   	});
-		var path1 = "./user_data/projects/" + project_name + "/_" + user_id + "/bin/"+project_name+"-release.apk";
 
 
 	// 빌드 끝내고 apk 파일도 전송해 줘야함.
@@ -416,10 +418,8 @@ app.get('/btm_menu_run', function(request, response){
 		if (err === null)
 		{
 			console.log(context, "	successful");
-			//sys.print('stdout : '+ stdout);
-			//response.send(stdout);
-		response.download(path1);
-
+			sys.print('stdout : '+ stdout);
+			response.send(stdout);
 		}
 		else
 		{
