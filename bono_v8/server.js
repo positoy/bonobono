@@ -33,7 +33,7 @@ var rimraf = require('rimraf');
 // ************************************* 2.26 ******************************
 
 
-//****************************** work sunc ******************************
+//****************************** work sync ******************************
 var CurrentProjectsArray = [];
 
 function projectObj(_name, _workArray) {
@@ -48,17 +48,17 @@ function taskObj(_name, _work) {
 	this.work = _work;
 }
 //1.// var task1 = new taskObj(user_name,file_path);
-var workArray = [];
 //2.// workArray.push(task1);
 
 ///////////////test dummy
-var t1 = new taskObj('chang','./user_data/projects/test/_a/ant.properties');
-workArray.push(t1);
-var t2 = new taskObj('chang','testfile');
-workArray.push(t2);
+// var workArray1 = [];
+// var t1 = new taskObj('chang','./user_data/projects/ace_test2/_a/ant.properties');
+// workArray1.push(t1);
+// var t2 = new taskObj('chang','testfile');
+// workArray1.push(t2);
 
-proj1 = new projectObj('test',workArray);
-CurrentProjectsArray.push(proj1);
+// proj1 = new projectObj('ace_test2',workArray1);
+// CurrentProjectsArray.push(proj1);
 
 //****************************** work sync ******************************
 
@@ -572,6 +572,25 @@ app.post('/project_create', function(req, res){
 	}
 
 	db.projectinfo.create(user_id, project_name, project_desc, project_create_handler, res);
+	
+	//*********************************************************************************
+	// 얘 다시!!!!!!!!!!!! 새 프로젝트 만들때도 만들어줘야하니까 주석빼야할듯
+	var workArray = [];	//일단 빈거 넣어주고
+	var p = new projectObj(project_name, workArray);
+	CurrentProjectsArray.push(p);
+	//얘를 invite되서 사용자가 해당 프로젝트에 들어갈때도 해줘야된다.★★
+
+	/////////////////////////test dummy
+	//var workArray1 = [];
+	var t1 = new taskObj('chang','./user_data/projects/aync_test/_a/ant.properties');
+	//workArray1.push(t1);
+	var t2 = new taskObj('chang','testfile');
+	//workArray1.push(t2);
+
+	//proj1 = new projectObj('ace_test2',workArray1);
+	CurrentProjectsArray[0].workArray.push(t1);
+	CurrentProjectsArray[0].workArray.push(t2);
+	///////////////////////////////////////
 });
 
 /***************
@@ -877,6 +896,150 @@ io.on('connection', function(socket) {
 	});
 
 	// ****************************************************** 2.26
+
+
+	//////////////////////
+	// Enter the room 
+	//////////////////////
+	socket.on("in", function(room_data) {
+		socket.join(room_data);
+		socket.p_name = room_data;
+
+		console.log("/////////////////socket room check///////////////////////");
+		console.log("User " + socket.handshake.address + " in at : " + socket.p_name);
+		
+		//var p = new projectObj(room_data, workArray);
+		//CurrentProjectsArray.push(p);
+
+	});
+
+	socket.on("push_msg", function(data) {
+		console.log("/////////////////socket data check///////////////////////");			
+		console.log(data.id);
+		io.in(socket.p_name).emit("get_msg", data);
+	});
+
+
+	// ****************************** work sunc ******************************
+	// var CurrentProjectsArray = [];
+
+	// function projectObj(_name, _workArray) {
+	// 	this.p_name = name;
+	// 	this.workArray = _workArray;
+	// }
+	// //CurrentProjectsArray.push(projectObj1);
+
+	// function taskObj(_name, _work) {
+	// 	this.name = _name;
+	// 	this.worrk = _work;
+	// }
+	// //var task1 = new taskObj(user_name,file_path);
+	// //var workArray = [];
+	// //workArray.push(task1);
+	// //
+	// // ****************************** work sync ******************************
+	
+	//////////////////////
+	// Work Sync
+	//////////////////////
+
+	//data : {project: _GLOBAL.project, id:_GLOBAL.id, file_name: file}
+	socket.on("insert", function(data) {
+		console.log(data.id);
+		console.log(data.file_name);
+		
+		//***********data.file parsing
+		var path = data.file_name;
+		var splitArray = path.split('/');
+		var fileN = splitArray[splitArray.length - 1];
+		console.log("제대로파싱되니2----------" + fileN);
+
+
+		var t = new taskObj(data.id, fileN);
+		
+
+		//Current 통에서 프로젝트 이름을 찾아서 걔 안에다 넣어줘야한다.
+		for(var i in CurrentProjectsArray)
+		{
+			if(data.project == CurrentProjectsArray[i].p_name)
+			{
+				//해당 프로젝트의 workArray를 갱신
+				CurrentProjectsArray[i].workArray.push(t);
+				//test
+				for(var idx in CurrentProjectsArray[i].workArray) {
+					console.log(CurrentProjectsArray[i].workArray[idx]);
+				}
+				//
+				break;
+			}
+		}
+
+	});
+
+
+	//지금 선택된 파일이 수정해도 되는 건지 아닌지 확인한다.
+	//data : {project: _GLOBAL.project, id:_GLOBAL.id, file: file_path});
+	socket.on("work_sync",function(data){
+		// console.log("////////////////work_sync data check///////////////////");
+		// console.log(data.id);
+		// console.log(data.project);
+		// console.log(data.file);
+		var work_flag = 0;
+		var length = CurrentProjectsArray.length;
+
+		//***********data.file parsing
+		var path = data.file;
+		var splitArray = path.split('/');
+		var fileN = splitArray[splitArray.length - 1];
+		console.log("제대로파싱되니----------" + fileN);
+
+		
+		//console.log("CurrentProjectsArray.length::: " + CurrentProjectsArray.length);
+
+		if(length === 0) 
+		{
+			socket.emit("work_sync_response",work_flag);
+		}
+		else
+		{
+			for(var i in CurrentProjectsArray) 
+			{	
+				if(data.project === CurrentProjectsArray[i].p_name)
+				{
+					// (O)
+					for(var j in CurrentProjectsArray[i].workArray) 
+					{
+						// (O)
+						//console.log(j + " : " + CurrentProjectsArray[i].workArray[j].work);
+						if( fileN === CurrentProjectsArray[i].workArray[j].work)
+						{
+
+							console.log("다른 사용자가 편집중입니다.");
+							work_flag = 1;
+							break;
+						}	
+
+					}
+					if(work_flag === 1)
+						break;
+				}
+			}
+			//console.log("====================================================");
+			//console.log("CurrentProjectsArray::: " + CurrentProjectsArray);
+			console.log("server---------work_flag::: " + work_flag);
+
+			//var task = new taskObj(data.id, data.file);
+			//workArray.push(task1);
+			//var project1 = new projectObj(data.project, workArray);
+			socket.emit("work_sync_response",work_flag);
+
+
+		}
+
+	});
+
+
+
 
 	///////////////////
 	// PULL

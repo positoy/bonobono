@@ -25,7 +25,7 @@ function getParameterByName(name) {
 		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
-
+var add_flag = 0;
 
 
 $(document).ready(function() {
@@ -63,10 +63,23 @@ $(document).ready(function() {
 		//document.getElementById("right_editor_inner").style.fontSize = "15px";
 
 		//_working_flag설정
-		if(_working_flag === 1) {
+		if(_working_flag == 1) {
 			editor.setReadOnly(true);
 		} else {
-			editor.setReadOnly(false);
+			editor.setReadOnly(false);	
+			add_flag = 0;
+
+
+			$("#right_editor_inner").bind("keydown", function(e) {
+				if(add_flag == 0)
+				{
+					add_flag = 1;
+					alert("들어간다!!!!!!!!!");
+						socket.emit("insert", {project: _GLOBAL.project, id:_GLOBAL.id, file_name: file});
+				}
+			});
+
+
 		}
 
 
@@ -206,6 +219,7 @@ $(document).ready(function() {
 					$(e.target).removeClass("file_notSelected");
 					$(e.target).addClass("file_selected");
 
+					alert("_work_flag:::: " + _work_flag);
 					make_editor(data, file_path, 0, _work_flag);
 
 				}
@@ -214,10 +228,6 @@ $(document).ready(function() {
 			socket.removeListener("work_sync_response");
 
 		});
-
-
-
-
 
 		// var pre_sel = $("#right_topbar_sortable").children(".file_selected");
 		// $(pre_sel).removeClass("file_selected");
@@ -757,26 +767,22 @@ $(document).ready(function() {
 		}); 
 
 
-		//////////////////////////////////
-		// Enter the room 
-		//////////////////////////////////
-
-
-		//SEND
-		$("#btm_menu_subtract").click(function(){
-			socket.emit("push_msg", {id: _GLOBAL.id, project: _GLOBAL.project});
-		});
-
-
-		//RECEIVE
-		socket.on("get_msg", function(data) {
-			alert(data.project + "에 변경사항!" + "\n" + data.id + "님이 push하셨습니다.");
-			$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
-				console.log("/makeGitTree complete");
-				$("#git_tree_container").empty();
-				$("#git_tree_container").append(data);
+			//*************************//
+		    // room test
+		    //*************************//
+		    //SEND
+			$("#btm_menu_subtract").click(function(){
+				socket.emit("push_msg", {id: _GLOBAL.id, project: _GLOBAL.project});
 			});
-		}); 
+			//RECEIVE
+			socket.on("get_msg", function(data) {
+				alert(data.project + "에 변경사항!" + "\n" + data.id + "님이 push하셨습니다.");
+				$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
+					console.log("/makeGitTree complete");
+					$("#git_tree_container").empty();
+					$("#git_tree_container").append(data);
+				});
+			}); 
 	
 
 	////////////////////////////////////
