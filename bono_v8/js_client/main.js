@@ -2,7 +2,7 @@
 var isShownBtmMenu = false;			// boolean for bottom menu
 var isPerInfoVisible = false;		// boolean for personal_info menu
 var tree_root = "/home/choidora/Documents/test_folder/";
-
+var isShownimportMenu=false;
 var _GLOBAL = {};
 
 var user_id = "";
@@ -319,8 +319,13 @@ $(document).ready(function() {
 		console.log("in!");
 		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
 		isShownBtmMenu = false;
-		window.location = "/btm_menu_import?id=" + _GLOBAL.id + "&project=" + _GLOBAL.project;
 
+		$("#uploadSearch").animate({top : "90%"}, {duration: 1000, easing: 'easeInOutBack'});
+		
+	});	
+	$("#submit").click(function(data){
+		$("#uploadSearch").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
+		isShownBtmMenu = false;
 	});	
 
 	///////////////

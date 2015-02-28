@@ -21,7 +21,8 @@ var sys = require('sys');
 var exec = require('child_process').exec;
 var app = express();
 var EasyZip = require('easy-zip').EasyZip;
-
+var multer = require('multer');
+var unzip = require('unzip');
 
 // sessoin
 var cookieParser = require('cookie-parser');
@@ -82,11 +83,29 @@ app.use(serve_static(__dirname));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.Router());
 
+var _GLOBAL = {};
+var upload_done = false;
+
+app.use(multer({
+	dest:'./uploads',
+	rename: function(fieldname, filename){
+		return filename;
+	},
+	onFileUploadStart: function(file){
+		console.log(file.originalname+ ' is starting .....................................');
+	},
+	onFileUploadComplete: function(file){
+		console.log(file.fieldname+ ' uploaded to ' + file.path);
+		upload_done = true;
+
+	}
+}));
+
+
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 var __DIR = './user_data/projects/';
-var _GLOBAL = {};
 
 // method - get /
 app.get('/', function(req, res){
@@ -331,22 +350,61 @@ app.get('/btm_menu_export', function(request, response){
 	
 });
 //import
-app.get('/btm_menu_import', function(request, response){
+app.post('/upload',function(req,res){//import zipfile
+	if(upload_done){
+		console.log(req.files);
+		upload_done=false;
+		var upload_project_name = req.files.uploadFile.originalname;	
+		var user_id = req.session.user_id ;
+		var project_name=upload_project_name.split(".");
+		project_name = project_name[0];
+		var project_desc = project_name+" made by "+ user_id;
+		console.log("[user_id] = " +user_id);
+		console.log("[upload_project_name] = " + upload_project_name);
+		console.log("[project_name] = " + project_name[0]);
+		console.log("[project_desc] = " + project_desc);
+////////upload end////////create start////////////////
+	//	var path = "./user_data/projects/";
 
-	var context = "[/btm_menu_import] : ";
-
-	console.log(context, "connected");
-
-	var user_id = request.param("id");
-	var project_name = request.param("project");
-	console.log(_GLOBAL.cur_project_target);
-	console.log(path);
-
-	
+		var context = "[/project_add] : ";
 
 
+		console.log(context, "project creation request");
+
+		function project_create_handler(project_create_successful, res)
+		{
+			if (project_create_successful)
+			{
+				res.send("project_create_successed");
+			}
+			else
+			{
+				res.send("project_create_failed");
+			}
+		}
+
+		db.projectinfo.create(user_id, project_name, project_desc, project_create_handler, res);
+		
+		//*********************************************************************************
+		// 얘 다시!!!!!!!!!!!! 새 프로젝트 만들때도 만들어줘야하니까 주석빼야할듯
+		var workArray = [];	//일단 빈거 넣어주고
+		var p = new projectObj(project_name, workArray);
+		CurrentProjectsArray.push(p);
+		//얘를 invite되서 사용자가 해당 프로젝트에 들어갈때도 해줘야된다.★★
+
+		/////////////////////////test dummy
+		//var workArray1 = [];
+		var t1 = new taskObj('chang','./user_data/projects/aync_test/_a/ant.properties');
+		//workArray1.push(t1);
+		var t2 = new taskObj('chang','testfile');
+		//workArray1.push(t2);
+
+		//proj1 = new projectObj('ace_test2',workArray1);
+		CurrentProjectsArray[0].workArray.push(t1);
+		CurrentProjectsArray[0].workArray.push(t2);
+		///////////////////////////////////////
+	}
 });
-
 
 
 //child : run
