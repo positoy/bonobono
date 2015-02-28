@@ -116,9 +116,59 @@ exports.create = function(project_name, user_name, user_email, handler) {
 			}
 		});
 	};
+	
 
+	var task5 = function(callback){//target update
+
+
+	
+	//var context = "[git create project] : ";
+	//var DIR_PROJECT = __DIR + project_name;
+	//var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	//afasfd//var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
+
+	
+	console.log("readfilejs "+DIR_PROJECT_USER);
+
+	fs.readFile(DIR_PROJECT_USER+'/'+"project.properties", 'utf8', function(err, data) {
+		
+		console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!@@@@@@@@@@@@@@@@@@ : " +data);
+ 		if(typeof(data)===undefined){
+ 			res.send("no project , please create project!")
+ 		}
+
+ 		var n = data.search("target=");
+ 		if(n===-1){
+			var k=24;
+ 		}
+ 		else{
+ 		data = data.substring(n,data.length-1);
+ 		var k = data.split("\n");
+ 		k = k[0].substring(7, k[0].length);
+		}		
+		console.log("res : " + k);
+
+		var child = exec("cd " + DIR_PROJECT_USER +"; android update project -p . -t "+ k +";" + " cd ../appcompat_v7; "+ "android update project -p . -t "+ k +"; " , function(error, stdout ,stderr){
+			var context = "[/update target] : ";
+
+			//console.log(context, "connected");
+			//console.log("in "+ _GLOBAL.cur_project_target);
+			if (error !== null)
+			{
+				console.log(context, "error-");
+				console.log(error);
+			}
+			else
+			{
+				console.log(context, "successful-");
+				callback(null);
+			}
+		});
+	});
+}
+	
 	// 빌드에 필요한 라이브러리 카피하기
-	var task5 = function(callback)
+	var task6 = function(callback)
 	{
 		var cmd1 = "cp -rf ./user_data/build/appcompat_v7 " + DIR_PROJECT;
 		var cmd2 = "cp " + DIR_PROJECT + "/appcompat_v7/libs/android-support-v4.jar " + DIR_PROJECT_USER + "/libs"
@@ -142,7 +192,7 @@ exports.create = function(project_name, user_name, user_email, handler) {
 	};
 
 	// git add, commit, push
-	var task6 = function(callback)
+	var task7 = function(callback)
 	{
 		var cmd1 = "cd " + DIR_PROJECT_USER;
 		var cmd2 = "git add --a";
@@ -172,7 +222,7 @@ exports.create = function(project_name, user_name, user_email, handler) {
 			handler();
 	};
 
-	async.waterfall([task0, task1, task2, task3, task4, task5, task6], callback);
+	async.waterfall([task0, task1, task2, task3, task4, task5, task6, task7], callback);
 };
 
 /****** execute a unix command with node.js MORE CONCISELY **

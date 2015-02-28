@@ -464,7 +464,7 @@ app.get('/btm_menu_run', function(request, response){
 			});
   		}
   	});
-		var path1 = "./user_data/projects/" + project_name + "/_" + user_id + "/bin/"+project_name+"-release.apk";
+		//var path1 = "./user_data/projects/" + project_name + "/_" + user_id + "/bin/"+project_name+"-release.apk";
 
 
 	// 빌드 끝내고 apk 파일도 전송해 줘야함.
@@ -474,7 +474,7 @@ app.get('/btm_menu_run', function(request, response){
 			console.log(context, "	successful");
 			//sys.print('stdout : '+ stdout);
 			//response.send(stdout);
-		response.download(path1);
+		//response.download(path1);
 
 		}
 		else
@@ -485,6 +485,8 @@ app.get('/btm_menu_run', function(request, response){
 		}
 	});
 });
+
+
 
 app.get('/updatetarget', function(req, res){
 
@@ -536,8 +538,6 @@ app.get('/updatetarget', function(req, res){
 
 
 });
-
-
 /**********************************************************************
 	POST MESSAGE HANDLERS
 **********************************************************************/

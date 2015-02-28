@@ -174,6 +174,23 @@ html, body {
 	opacity: 1;
 }
 
+#uploadSearch form{
+	
+	display:inline;
+}
+#uploadSearch {
+	overflow: hidden;
+	width: 55%;
+	height: 150px;
+	margin: auto;
+	position: fixed;
+	top: 130%;
+	left: 70%;
+	transform: translate(-50%, -50%);
+	z-index: 99999;
+}
+
+
 /*Bottom Menu Css*/
 #btm_menu ul {
 	list-style: none;

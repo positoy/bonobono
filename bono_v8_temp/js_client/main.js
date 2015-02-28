@@ -302,14 +302,6 @@ $(document).ready(function() {
 		});
 	});
 
-	$("#btm_menu_run").click(function(){
-		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
-			isShownBtmMenu = false;
-		$.get("/btm_menu_run?id=" + _GLOBAL.id + "&project=" + _GLOBAL.project, function(data, status){
-			alert(data);
-		});
-	});
-	///////////////
 	$("#btm_menu_export").click(function(){
 		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
 		isShownBtmMenu = false;
@@ -319,10 +311,14 @@ $(document).ready(function() {
 		console.log("in!");
 		$("#btm_menu").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
 		isShownBtmMenu = false;
-		window.location = "/btm_menu_import?id=" + _GLOBAL.id + "&project=" + _GLOBAL.project;
 
+		$("#uploadSearch").animate({top : "90%"}, {duration: 1000, easing: 'easeInOutBack'});
+		
 	});	
-
+	$("#submit").click(function(data){
+		$("#uploadSearch").animate({top : "130%"}, {duration: 1000, easing: 'easeInOutBack'});
+		isShownBtmMenu = false;
+	});	
 	///////////////
 	$("#dialog_select_project_proj").scroll();
 
