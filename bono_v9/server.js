@@ -509,11 +509,19 @@ app.get('/updatetarget', function(req, res){
             return;
  		}
  		var n = data.search("target=");
+ 		if(n===-1){
+			var k=24;
+ 		}
+ 		else{
+ 			data = data.substring(n,data.length-1);
+ 			var k = data.split("\n");
+ 			k = k[0].substring(7, k[0].length);
+ 		}		console.log("res : " + k);
 
-		var resTarget = data.substring(n+7,data.length-1);
-		console.log("res : " + resTarget);
+		//var resTarget = data.substring(n+7,data.length-1);
+		//console.log("res : " + resTarget);
 
-		_GLOBAL.cur_project_target = resTarget;
+		_GLOBAL.cur_project_target = k;
 		//console.log("again : "+ _GLOBAL.cur_project_target);
 
 
