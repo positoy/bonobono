@@ -977,7 +977,6 @@ $(document).ready(function() {
     function hdlr_showBox(e)
     {
         console.log("showBox", e.which);
-
         if (e.ctrlKey)
         {
             console.log("ctrl on");

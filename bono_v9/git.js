@@ -247,6 +247,8 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 	// central repository
 	var task1 = function(callback)
 	{
+		console.log("[task1]");
+
 		var cmd = "git --bare init " + DIR_PROJECT_ORIGIN;
 		var child = exec(cmd, function(error, stdout, stderr) {
 
@@ -265,7 +267,9 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 
 	// clone repository
 	var task2 = function(callback)
-	{
+	{		
+		console.log("[task2]");
+
 		var cmd = "git clone " + DIR_PROJECT_ORIGIN + " " + DIR_PROJECT_USER;
 		var child = exec(cmd, function(error, stdout, stderr) {
 
@@ -292,7 +296,9 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 	// "
 	// to '_user/.git/config' file.
 	var task3 = function(callback)
-	{
+	{		
+		console.log("[task3]");
+
 		var str1 = "[user]\n";
 		var str2 = "\temail = " + user_email + "\n";
 		var str3 = "\tname = " + user_name + "\n";
@@ -314,8 +320,12 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 
 	// clone repository를 안드로이드 프로젝트로 만들기
 	var task4 = function(callback)
-	{
-		var cmd = "android create project --name " + project_name + " --activity MainActivity --package com.bonobono." + project_name + " --target 10 --path " + DIR_PROJECT_USER;
+	{			
+		console.log("[task4]");
+
+
+		var cmd = "unzip " + "./uploads/"+project_name +".zip -d ./uploads/;" 
+		console.log(cmd);
 		var child = exec(cmd, function(error, stdout, stderr) {
 
 			if (error !== null)
@@ -330,10 +340,31 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 			}
 		});
 	};
-	
+	var task5 = function(callback)
+	{			
+		console.log("[task5]");
 
-	var task5 = function(callback){//target update
 
+		var cmd = "cd ./uploads/" +project_name +"; mv -f ./* ../../user_data/projects/"+ project_name + "/_"+ user_name+"/;"
+
+		console.log(cmd);
+		var child = exec(cmd, function(error, stdout, stderr) {
+
+			if (error !== null)
+			{
+				console.log(context, "error-", cmd);
+				console.log(error);
+			}
+			else
+			{
+				console.log(context, "successful-", cmd)
+				callback(null);
+			}
+		});
+	};
+	var task6 = function(callback){//target update
+
+		console.log("[task6]");
 
 	
 	//var context = "[git create project] : ";
@@ -347,10 +378,11 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 	fs.readFile(DIR_PROJECT_USER+'/'+"project.properties", 'utf8', function(err, data) {
 		
 		console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!@@@@@@@@@@@@@@@@@@ : " +data);
- 		if(typeof(data)===undefined){
- 			res.send("no project , please upload project!")
+ 		if(typeof(data)==="undefined"){
+ 			console.log("no project , please upload project!")
+ 			return;
  		}
-
+ 		console.log(data);
  		var n = data.search("target=");
  		if(n===-1){
 			var k=24;
@@ -363,27 +395,56 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 		console.log("res : " + k);
 
 		var child = exec("cd " + DIR_PROJECT_USER +"; android update project -p . -t "+ k +";" + " cd ../appcompat_v7; "+ "android update project -p . -t "+ k +"; " , function(error, stdout ,stderr){
-			var context = "[/update target] : ";
+				var context = "[/update target] : ";
 
-			//console.log(context, "connected");
-			//console.log("in "+ _GLOBAL.cur_project_target);
+				//console.log(context, "connected");
+				//console.log("in "+ _GLOBAL.cur_project_target);
+				if (error !== null)
+				{
+					console.log(context, "error-");
+					console.log(error);
+				}
+				else
+				{
+					console.log(context, "successful-");
+					callback(null);
+				}
+			});
+		});
+	}
+	var task7 = function(callback){//rm zip, folder
+
+
+	
+	//var context = "[git create project] : ";
+	//var DIR_PROJECT = __DIR + project_name;
+	//var DIR_PROJECT_ORIGIN = DIR_PROJECT + "/origin";
+	//afasfd//var DIR_PROJECT_USER = DIR_PROJECT + "/_" + user_name;
+
+		var cmd = "cd ./uploads/; rm -r "+project_name+ " && rm "+project_name+".zip";
+		console.log("[task7]");
+
+		var child = exec(cmd, function(error, stdout, stderr) {
+
 			if (error !== null)
 			{
-				console.log(context, "error-");
+				console.log(context, "error-", cmd);
 				console.log(error);
 			}
 			else
 			{
-				console.log(context, "successful-");
+				console.log(context, "successful-", cmd)
 				callback(null);
 			}
 		});
-	});
-}
-	
+
+	}
 	// 빌드에 필요한 라이브러리 카피하기
-	var task6 = function(callback)
+	var task8 = function(callback)
 	{
+				
+		console.log("[task8]");
+
 		var cmd1 = "cp -rf ./user_data/build/appcompat_v7 " + DIR_PROJECT;
 		var cmd2 = "cp " + DIR_PROJECT + "/appcompat_v7/libs/android-support-v4.jar " + DIR_PROJECT_USER + "/libs"
 		//var cmd3 = "cp ./user_data/build/test.keystore " + DIR_PROJECT_USER;
@@ -406,8 +467,11 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 	};
 
 	// git add, commit, push
-	var task7 = function(callback)
+	var task9 = function(callback)
 	{
+				
+		console.log("[task9]");
+
 		var cmd1 = "cd " + DIR_PROJECT_USER;
 		var cmd2 = "git add --a";
 		var cmd3 = 'git commit -m "first commit"'
@@ -436,7 +500,7 @@ exports.upload = function(project_name, user_name, user_email, handler) {
 			handler();
 	};
 
-	async.waterfall([task0, task1, task2, task3, task4, task5, task6, task7], callback);
+	async.waterfall([task0, task1, task2, task3, task4, task5, task6, task7, task8, task9], callback);
 };
 /****** execute a unix command with node.js MORE CONCISELY **
 
