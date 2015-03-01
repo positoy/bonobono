@@ -36,6 +36,71 @@ $(document).ready(function() {
 	var prv_contents;
 	var file_cnt = 0;
 	var socket = io();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//	user in...
+
+	$("#user_1").css("visibility", "visible");
+	$("#user_1 > p").html("&nbsp;&nbsp;&nbsp;&nbsp;" + "cwlsn88");
+
+
+// for junseok
+	$("#btm_menu_apk").click(function(){
+		alert("APK!");
+	});
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 	
 
@@ -74,8 +139,8 @@ $(document).ready(function() {
 				if(add_flag == 0)
 				{
 					add_flag = 1;
-					alert("들어간다!!!!!!!!!");
-						socket.emit("insert", {project: _GLOBAL.project, id:_GLOBAL.id, file_name: file});
+					alert("파일을 수정합니다.\n팀의 다른멤버는 파일에 접근할 수 없습니다.\n수정 후 반드시 저장해주세요.");
+					socket.emit("insert", {project: _GLOBAL.project, id:_GLOBAL.id, file_name: file});
 				}
 			});
 
@@ -204,8 +269,7 @@ $(document).ready(function() {
 		var file_path = $(e.target).children("a").attr("data-path");
 
 		//지금 선택된 파일이 수정해도 되는 건지 아닌지 확인하라고 시킨다.
-		socket.emit("work_sync",{project: _GLOBAL.project, id:_GLOBAL.id, file: file_path});
-
+		socket.emit("work_sync", {project: _GLOBAL.project, id:_GLOBAL.id, file: file_path});
 
 		socket.on("work_sync_response", function(_work_flag) {
 
@@ -380,7 +444,7 @@ $(document).ready(function() {
 		    //*************************//
 		    // Enter the room 
 		    //*************************//
-			socket.emit("in", _GLOBAL.project);
+			socket.emit("in", {project:_GLOBAL.project, id:_GLOBAL.id});
 
 
 			$("#dialog_select_project").dialog("close");
@@ -571,8 +635,10 @@ $(document).ready(function() {
 			var res = confirm("Logout?");
 			if(res){
 				$.get('/logout', function(data, stat){
-					if(data == "logout")
+					if(data == "logout") {
+						socket.emit("logout_delete", _GLOBAL.id);
 						window.location = "/";
+					}
 				});
 			}
 		}
@@ -720,6 +786,76 @@ $(document).ready(function() {
 	
 	
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	$(".users_label").click(function(e){
+		var t = e.target;
+		$(t).parent().toggleClass("users_open", 700, 'easeInOutBack');
+
+
+
+		
+		var usr_id = $(t).parent().children("p").text();
+		$("#user_contents_inner").text(usr_id + "work array");
+
+
+
+	});
+	
+	$(".users > p").mouseenter(function(e){
+		var pos = $(e.target).parent().position();
+		$("#user_contents").css("top", pos.top);
+		$("#user_contents").removeClass("uc_off");
+		$("#user_contents").addClass("uc_on");
+	});
+	
+	$(".users > p").mouseleave(function(e){
+		$("#user_contents").removeClass("uc_on");
+		$("#user_contents").addClass("uc_off");
+		var t = e.target;
+		$(t).parent().toggleClass("users_open", 700, 'easeInOutBack');
+	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 	
 	
@@ -887,6 +1023,8 @@ $(document).ready(function() {
 
 				alert(data.project + "에 변경사항!" + "\n" + data.id + "님이 push하셨습니다.");
 				
+				socket.emit("pushids",{project: data.project, id: data.id});
+
 				//gitTree draw
 				$.get('/makeGitTree?path=' +_GLOBAL.project+ "&id=" +_GLOBAL.id, function(data, status){
 					console.log("/makeGitTree complete");
