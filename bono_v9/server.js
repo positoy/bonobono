@@ -944,7 +944,7 @@ io.on('connection', function(socket) {
 		console.log("/////////////////socket room check///////////////////////");
 		console.log("User " + socket.handshake.address + " in at : " + socket.p_name);
 		
-		// 0. 사용자가 이미 속해있던 프로젝트의 work들을 빼준다.
+		// 0. 사용자가 이미 속해있던 다른 프로젝트의 work들을 빼준다.
 		//////////////////////
 		// IN - Work Delete
 		//////////////////////
