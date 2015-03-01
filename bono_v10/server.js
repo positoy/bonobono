@@ -1195,7 +1195,6 @@ io.on('connection', function(socket) {
 			// 1) Current 통에서 프로젝트 이름을 찾아서
 			for(var i in CurrentProjectsArray)
 			{	
-				console.log("rewrwwerwerwerrrrrrrrrrrrrrrrrrrrrrrrrrrr");
 				// 2) 같은 이름의 프로젝트를 찾으면
 				if(data.project == CurrentProjectsArray[i].p_name)
 				{
@@ -1204,8 +1203,7 @@ io.on('connection', function(socket) {
 					CurrentProjectsArray[i].workArray.push(t);
 					for(var idx in CurrentProjectsArray[i].workArray) {
 						console.log(CurrentProjectsArray[i].workArray[idx]);
-					}
-						
+					}						
 				}
 
 			}
@@ -1213,6 +1211,9 @@ io.on('connection', function(socket) {
 		console.log("insert 후===========================");
 		console.log(CurrentProjectsArray);
 		console.log("====================================");
+
+		//오른쪽 포스트잇으로 보내준다.
+		socket.emit("work_insert_response", data);
 
 	});
 
