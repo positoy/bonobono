@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">logTest1</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="splash_text1">  %s</string>
+    <string name="splash_text2">%s</string>
+	<color name="mainColor">#00A6A9</color>
+</resources>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main" 
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" 
+    android:background="@color/mainColor">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.88"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.98" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.58"
+            android:gravity="center_horizontal" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="0.54"
+                        android:gravity="bottom|right"
+                        android:paddingRight="10dp"
+                        android:text="대리운전은 역시!"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:layout_weight="2.05"
+                        android:gravity="bottom|left"
+                        android:text="@string/splash_text1"
+                        android:textColor="#ffffff"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" >
+
+                    <TextView
+                        android:id="@+id/textView1"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_weight="3"
+                        android:gravity="center_horizontal"
+                        android:textColor="#ffffff"
+                        android:textSize="54sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp" >
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="fill_parent"
+            android:layout_height="200px"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.61"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/splash_text2"
+            android:textColor="#ffffff" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.10"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Powered by QuickMotion\n문의 (02)1234-5678"
+            android:textColor="#ffffff"
+            android:textSize="16sp" />
+    </RelativeLayout>
+    
+</LinearLayout>
